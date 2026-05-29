@@ -63,7 +63,7 @@ jobs:
             --data "$domain_body")"
 
           if [ "$(echo "$domain_response" | jq -r '.success')" != "true" ]; then
-            if ! echo "$domain_response" | jq -r '.errors[].message' | grep -Eiq 'already exists|already been taken|domain.*exists'; then
+            if ! echo "$domain_response" | jq -r '.errors[].message' | grep -Eiq 'already exists|already added|already been taken|domain.*exists'; then
               echo "$domain_response"
               exit 1
             fi
