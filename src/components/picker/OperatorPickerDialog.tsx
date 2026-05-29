@@ -111,7 +111,7 @@ export function OperatorPickerDialog({
                 <span>
                   <span className={styles.operatorCardName}>{operator.name}</span>
                   <span className={styles.operatorMeta}>
-                    {operator.profession ?? "干员"} · {operator.rarity ? `${operator.rarity}★` : "rarity ?"}
+                    {operator.profession ?? "干员"} · {operator.rarity ? `${operator.rarity+1}★` : "rarity ?"}
                   </span>
                   <span className={styles.tagRow}>
                     {operator.buildingSkills.slice(0, 3).map((skill) => (
