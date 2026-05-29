@@ -11,10 +11,11 @@ describe("generated data", () => {
   it("keeps operator manifest shape stable", () => {
     const manifest = readJson<OperatorManifest>(join(process.cwd(), "public/operators/manifest.json"));
 
-    expect(manifest.operators).toHaveLength(417);
+    expect(manifest.operators).toHaveLength(415);
     expect(manifest.source.portraitFiles).toBe(417);
     expect(manifest.operators[0]).toHaveProperty("portraitPath");
-    expect(new Set(manifest.operators.map((operator) => operator.id)).size).toBe(417);
+    expect(new Set(manifest.operators.map((operator) => operator.id)).size).toBe(415);
+    expect(manifest.operators.filter((operator) => operator.aliases.includes("Amiya"))).toHaveLength(1);
   });
 
   it("keeps building reference counts and filter options", () => {

@@ -68,10 +68,11 @@ const operators = metadata
     const rarityIconFile = rarityIconByValue.get(row.rarity);
     const fallbackStem = normalize(row.zh ?? row.en ?? row.id);
     const baseId = normalize(row.id ?? fallbackStem);
-    const id = seenIds.has(baseId) ? `${baseId}-${normalize(row.zh ?? fallbackStem)}` : baseId;
+    const id = baseId;
 
-    if (id !== baseId) {
-      warnings.push(`Duplicate operator id: ${baseId}; generated unique frontend id ${id}`);
+    if (seenIds.has(baseId)) {
+      warnings.push(`Duplicate operator id: ${baseId}; skipped metadata row ${row.zh ?? fallbackStem}`);
+      return null;
     }
     seenIds.add(id);
 
@@ -104,6 +105,7 @@ const operators = metadata
       sortKey: portraitFile ?? row.zh ?? id,
     };
   })
+  .filter(Boolean)
   .sort((a, b) => a.sortKey.localeCompare(b.sortKey, "zh-Hans-CN"))
   .map(({ sortKey: _sortKey, ...operator }) => operator);
 

@@ -74,6 +74,16 @@ describe("maaCustomInfrastToScheduleDocument", () => {
     expect(trade?.operators[0].operatorId).toBe("op-blacknight");
     expect(trade?.operators[1].operatorId).toBe("op-jixing");
     expect(trade?.operators[2].overrideName).toBe("可露希尔");
+
+    const powerAssignments = document?.queues[0].roomAssignments.filter(
+      (assignment) => assignment.roomType === "POWER",
+    ) ?? [];
+    expect(powerAssignments).toHaveLength(3);
+    expect(powerAssignments.map((assignment) => assignment.operators[0].overrideName)).toEqual([
+      "承曦格雷伊",
+      "烛煌",
+      "格雷伊",
+    ]);
   });
 
   it("infers 153 layout from one trade, five manufacturing and three power rooms", () => {

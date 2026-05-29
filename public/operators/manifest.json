@@ -1,14 +1,14 @@
 {
   "source": {
     "localSourcePath": "D:\\Code Rep\\arknights\\avatars",
-    "generatedAt": "2026-05-28T22:04:45.576Z",
+    "generatedAt": "2026-05-29T09:49:00.542Z",
     "metadataRows": 417,
     "portraitFiles": 417,
     "professionIconFiles": 8,
     "rarityIconFiles": 6,
     "warnings": [
-      "Duplicate operator id: R001; generated unique frontend id R001-阿米娅-医疗",
-      "Duplicate operator id: R001; generated unique frontend id R001-阿米娅-近卫"
+      "Duplicate operator id: R001; skipped metadata row 阿米娅(医疗)",
+      "Duplicate operator id: R001; skipped metadata row 阿米娅(近卫)"
     ]
   },
   "operators": [
@@ -4761,53 +4761,6 @@
       ],
       "profession": "术师",
       "subProfession": "中坚术师",
-      "rarity": 4,
-      "source": "avatars"
-    },
-    {
-      "id": "R001-阿米娅-医疗",
-      "name": "阿米娅(医疗)",
-      "portraitPath": "/operators/portraits/R001_阿米娅.png",
-      "professionIconPath": "/operators/profession/图标_职业_医疗.png",
-      "rarityIconPath": "/operators/rarity/稀有度_黄_4.png",
-      "aliases": [
-        "阿米娅(医疗)",
-        "Amiya",
-        "R001",
-        "R001_阿米娅"
-      ],
-      "tags": [
-        "治疗",
-        "输出",
-        "远程位",
-        "医疗"
-      ],
-      "profession": "医疗",
-      "subProfession": "咒愈师",
-      "rarity": 4,
-      "source": "avatars"
-    },
-    {
-      "id": "R001-阿米娅-近卫",
-      "name": "阿米娅(近卫)",
-      "portraitPath": "/operators/portraits/R001_阿米娅.png",
-      "professionIconPath": "/operators/profession/图标_职业_近卫.png",
-      "rarityIconPath": "/operators/rarity/稀有度_黄_4.png",
-      "aliases": [
-        "阿米娅(近卫)",
-        "Amiya",
-        "アーミヤ",
-        "R001",
-        "R001_阿米娅"
-      ],
-      "tags": [
-        "输出",
-        "支援",
-        "近战位",
-        "近卫"
-      ],
-      "profession": "近卫",
-      "subProfession": "术战者",
       "rarity": 4,
       "source": "avatars"
     },

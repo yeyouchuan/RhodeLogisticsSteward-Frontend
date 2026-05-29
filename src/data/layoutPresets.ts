@@ -224,10 +224,10 @@ export const layoutPresets: LayoutPreset[] = [
       }),
       column({
         id: "power",
-        label: "电力/宿舍",
+        label: "电力",
         facility: "Power",
         theme: "other",
-        roomsPerQueue: [powerRoom(1), dormRoom(1), dormRoom(2)],
+        roomsPerQueue: [powerRoom(1), powerRoom(2), powerRoom(3)],
         widthWeight: 1.35,
       }),
     ],
