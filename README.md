@@ -29,8 +29,8 @@
 ## 本地运行
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 开发服务器启动后，按终端输出的本地地址访问页面。
@@ -40,13 +40,13 @@ npm run dev
 ## 刷新静态数据
 
 ```bash
-npm run generate:data
+bun run generate:data
 ```
 
 该命令会依次运行：
 
-- `npm run generate:operators`
-- `npm run generate:building`
+- `bun run generate:operators`
+- `bun run generate:building`
 
 默认数据来源是本机的以下路径：
 
@@ -58,7 +58,7 @@ npm run generate:data
 ```bash
 $env:RLS_AVATARS_DIR="D:\path\to\avatars"
 $env:RLS_BUILDING_DATA_DIR="D:\path\to\arknights-building-data\data"
-npm run generate:data
+bun run generate:data
 ```
 
 生成结果会写入：
@@ -72,22 +72,22 @@ npm run generate:data
 ## 常用脚本
 
 ```bash
-npm run dev
-npm run lint
-npm test
-npm run build
-npm run e2e
-npm run preview
+bun run dev
+bun run lint
+bun run test
+bun run build
+bun run e2e
+bun run preview
 ```
 
 脚本说明：
 
-- `npm run dev`：启动 Vite 开发服务器。
-- `npm run lint`：运行 ESLint。
-- `npm test`：运行 Vitest 单元测试和组件测试。
-- `npm run build`：执行 TypeScript 构建检查并生成生产包。
-- `npm run e2e`：运行 Playwright 端到端测试，配置会自动启动 `npm run preview`。
-- `npm run preview`：预览生产构建产物。
+- `bun run dev`：启动 Vite 开发服务器。
+- `bun run lint`：运行 ESLint。
+- `bun run test`：运行 Vitest 单元测试和组件测试。
+- `bun run build`：执行 TypeScript 构建检查并生成生产包。
+- `bun run e2e`：运行 Playwright 端到端测试，配置会自动启动 `bun run preview`。
+- `bun run preview`：预览生产构建产物。
 
 ## 项目结构
 
@@ -107,7 +107,8 @@ npm run preview
 │   ├── components/          # 组件测试
 │   ├── domain/              # 领域逻辑测试
 │   └── e2e/                 # Playwright 测试
-└── package.json
+├── package.json
+└── bun.lock
 ```
 
 ## 数据格式
