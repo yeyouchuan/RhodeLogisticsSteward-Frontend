@@ -447,7 +447,7 @@
   left: 50%;
   display: grid;
   width: min(920px, calc(100vw - 28px));
-  max-height: min(760px, calc(100vh - 28px));
+  max-height: min(760px, calc(80vh - 28px));
   grid-template-rows: auto auto 1fr auto;
   gap: 12px;
   overflow: hidden;
