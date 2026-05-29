@@ -58,7 +58,6 @@ export interface Operator {
 export interface OperatorManifest {
   source: {
     localSourcePath: string;
-    generatedAt: string;
     metadataRows: number;
     portraitFiles: number;
     professionIconFiles: number;

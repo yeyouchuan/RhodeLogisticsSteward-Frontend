@@ -242,7 +242,6 @@ await runWithConcurrency(eliteIconFiles, conversionConcurrency, (file) =>
 const manifest = {
   source: {
     localSourcePath: sourceRoot,
-    generatedAt: new Date().toISOString(),
     metadataRows: metadata.length,
     portraitFiles: files.length,
     professionIconFiles: professionIconFiles.length,
