@@ -1,0 +1,6 @@
+:root {
+  --motion-speed-multiplier: 1.15;
+  --motion-enter-fast: 240ms;
+  --motion-enter-base: 320ms;
+  --motion-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+}

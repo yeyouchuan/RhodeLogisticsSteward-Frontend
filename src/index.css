@@ -1,0 +1,165 @@
+@font-face {
+  font-family: "MiSans";
+  src: url("/fonts/MiSans VF.ttf") format("truetype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 100 900;
+}
+
+@font-face {
+  font-family: "Source Han Serif CN";
+  src: url("/fonts/SourceHanSerifCN-ExtraLight_0.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 200;
+}
+
+@font-face {
+  font-family: "Source Han Serif CN";
+  src: url("/fonts/SourceHanSerifCN-Light_0.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: "Source Han Serif CN";
+  src: url("/fonts/SourceHanSerifCN-Regular_0.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Source Han Serif CN";
+  src: url("/fonts/SourceHanSerifCN-Medium_0.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Source Han Serif CN";
+  src: url("/fonts/SourceHanSerifCN-SemiBold_0.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Source Han Serif CN";
+  src: url("/fonts/SourceHanSerifCN-Bold_0.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: "Source Han Serif CN";
+  src: url("/fonts/SourceHanSerifCN-Heavy_0.otf") format("opentype");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 900;
+}
+
+:root {
+  --color-ink: #1f2623;
+  --color-muted: #65716c;
+  --color-faint: #8a948f;
+  --color-page: #e9ece5;
+  --color-panel: #f8f7f0;
+  --color-panel-strong: #fffdf4;
+  --color-line: #c9cfc5;
+  --color-line-strong: #8d9a91;
+  --color-control: #dcebdd;
+  --color-trade: #dbeaf4;
+  --color-gold: #f4e6a7;
+  --color-record: #f2d8bd;
+  --color-other: #f4f2e8;
+  --color-danger: #b83232;
+  --color-focus: #1e6b58;
+  --shadow-panel: 0 16px 48px rgba(42, 50, 45, 0.12);
+  --shadow-tight: 0 8px 18px rgba(42, 50, 45, 0.12);
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --font-sans:
+    "MiSans", "Noto Sans SC", "Microsoft YaHei UI", "Microsoft YaHei",
+    "PingFang SC", "Segoe UI", sans-serif;
+  --font-display:
+    "Source Han Serif CN", "Source Han Serif SC", "Noto Serif SC", "SimSun",
+    "Microsoft YaHei UI", serif;
+  --motion-speed-multiplier: 1.15;
+  --motion-enter-fast: 240ms;
+  --motion-enter-base: 320ms;
+  --motion-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color: var(--color-ink);
+  background: var(--color-page);
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--color-page);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  scrollbar-color: #9aa8ab transparent;
+  scrollbar-width: thin;
+}
+
+* {
+  scrollbar-color: #9aa8ab transparent;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 20px;
+  height: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-clip: content-box;
+  background-color: #d6dee1;
+  border: 8px solid transparent;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #849295;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  letter-spacing: 0;
+}
+
+a {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
