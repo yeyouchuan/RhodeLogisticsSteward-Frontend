@@ -15,7 +15,6 @@ interface VariantToken {
   innerShadow: string;
   innerShadowHover: string;
   innerShadowPress: string;
-  lineColor: string;
   textColor: string;
   textShadow: string;
   iconBackground: string;
@@ -36,7 +35,6 @@ interface SizeToken {
   innerPaddingRight: number;
   iconSize: number;
   iconGlyph: number;
-  lineHeight: number;
   gap: number;
   textFontSize: string;
   textLineHeight: string;
@@ -59,7 +57,6 @@ const variantTokens: Record<ContourButtonVariant, VariantToken> = {
       "#FFFFFF24 0px 2px 0px inset, #0000003D 0px -8px 12px inset, rgba(255, 255, 255, 0.16) 0px 1px 0px inset",
     innerShadowPress:
       "#FFFFFF24 0px 2px 0px inset, #0000003D 0px -8px 12px inset, rgba(15, 23, 42, 0.22) 0px 5px 8px inset, rgba(255, 255, 255, 0.08) 0px 1px 0px",
-    lineColor: "#FFF9F33D",
     textColor: "#F4F0EA",
     textShadow: "#00000024 0px 1px 0px",
     iconBackground:
@@ -68,11 +65,11 @@ const variantTokens: Record<ContourButtonVariant, VariantToken> = {
     iconShadow:
       "#FFFFFFF0 0px 1px 0px inset, #736B6124 0px -3px 7px inset, #00000033 0px 2px 8px",
     iconColor: "#474442",
-    textureOpacity: 0.32,
-    textureMorphology: 2.2,
+    textureOpacity: 0.18,
+    textureMorphology: 1.65,
     textureTable:
       ".26 .26 .26 .26 .44 .44 .44 .44 .62 .62 .62 .62 .78 .78 .78 .78 .9 .9 .9 .9 .98 .98 .98 .98 1 1 1 1 1 1 1 1",
-    textureColorMatrix: "0 0 0 0 0.98 0 0 0 0 0.96 0 0 0 0 0.92 0 0 0 1 0",
+    textureColorMatrix: "0 0 0 0 0.82 0 0 0 0 0.80 0 0 0 0 0.76 0 0 0 1 0",
   },
   white: {
     outerBackground:
@@ -88,7 +85,6 @@ const variantTokens: Record<ContourButtonVariant, VariantToken> = {
       "#FFFFFF70 0px 2px 0px inset, #746A5F0F 0px -8px 12px inset, rgba(255, 255, 255, 0.16) 0px 1px 0px inset",
     innerShadowPress:
       "#FFFFFF70 0px 2px 0px inset, #746A5F0F 0px -8px 12px inset, rgba(15, 23, 42, 0.22) 0px 5px 8px inset, rgba(255, 255, 255, 0.08) 0px 1px 0px",
-    lineColor: "#5B51482E",
     textColor: "#413B36",
     textShadow: "#FFFFFF4D 0px 1px 0px",
     iconBackground:
@@ -97,11 +93,11 @@ const variantTokens: Record<ContourButtonVariant, VariantToken> = {
     iconShadow:
       "#FFFFFF1A 0px 1px 0px inset, #0000002E 0px -3px 7px inset, #0000002E 0px 2px 8px",
     iconColor: "#F7F3EB",
-    textureOpacity: 0.6,
-    textureMorphology: 2.35,
+    textureOpacity: 0.24,
+    textureMorphology: 1.65,
     textureTable:
       ".3 .3 .3 .3 .48 .48 .48 .48 .66 .66 .66 .66 .82 .82 .82 .82 .92 .92 .92 .92 .99 .99 .99 .99 1 1 1 1 1 1 1 1",
-    textureColorMatrix: "0 0 0 0 0.19 0 0 0 0 0.17 0 0 0 0 0.14 0 0 0 1 0",
+    textureColorMatrix: "0 0 0 0 0.42 0 0 0 0 0.39 0 0 0 0 0.34 0 0 0 1 0",
   },
   yellow: {
     outerBackground:
@@ -117,7 +113,6 @@ const variantTokens: Record<ContourButtonVariant, VariantToken> = {
       "#FFFFFF42 0px 2px 0px inset, #95801224 0px -8px 12px inset, rgba(255, 255, 255, 0.16) 0px 1px 0px inset",
     innerShadowPress:
       "#FFFFFF42 0px 2px 0px inset, #95801224 0px -8px 12px inset, rgba(15, 23, 42, 0.22) 0px 5px 8px inset, rgba(255, 255, 255, 0.08) 0px 1px 0px",
-    lineColor: "#7364123D",
     textColor: "#5A5423",
     textShadow: "#FFF8B429 0px 1px 0px",
     iconBackground:
@@ -126,11 +121,11 @@ const variantTokens: Record<ContourButtonVariant, VariantToken> = {
     iconShadow:
       "#FFFFFF1A 0px 1px 0px inset, #0000002E 0px -3px 7px inset, #0000002E 0px 2px 8px",
     iconColor: "#F0E64A",
-    textureOpacity: 0.68,
-    textureMorphology: 2.35,
+    textureOpacity: 0.26,
+    textureMorphology: 1.65,
     textureTable:
       ".3 .3 .3 .3 .48 .48 .48 .48 .66 .66 .66 .66 .82 .82 .82 .82 .92 .92 .92 .92 .99 .99 .99 .99 1 1 1 1 1 1 1 1",
-    textureColorMatrix: "0 0 0 0 0.18 0 0 0 0 0.15 0 0 0 0 0.015 0 0 0 1 0",
+    textureColorMatrix: "0 0 0 0 0.42 0 0 0 0 0.38 0 0 0 0 0.20 0 0 0 1 0",
   },
   red: {
     outerBackground:
@@ -146,7 +141,6 @@ const variantTokens: Record<ContourButtonVariant, VariantToken> = {
       "#FFFFFF33 0px 2px 0px inset, #981B1524 0px -8px 12px inset, rgba(255, 255, 255, 0.16) 0px 1px 0px inset",
     innerShadowPress:
       "#FFFFFF33 0px 2px 0px inset, #981B1524 0px -8px 12px inset, rgba(15, 23, 42, 0.22) 0px 5px 8px inset, rgba(255, 255, 255, 0.08) 0px 1px 0px",
-    lineColor: "#FFF6F13D",
     textColor: "#FFF4F1",
     textShadow: "#8D1D161F 0px 1px 0px",
     iconBackground:
@@ -155,42 +149,40 @@ const variantTokens: Record<ContourButtonVariant, VariantToken> = {
     iconShadow:
       "#FFFFFFF0 0px 1px 0px inset, #736B6124 0px -3px 7px inset, #0000002E 0px 2px 8px",
     iconColor: "#EF5A52",
-    textureOpacity: 0.34,
-    textureMorphology: 2.2,
+    textureOpacity: 0.2,
+    textureMorphology: 1.65,
     textureTable:
       ".26 .26 .26 .26 .44 .44 .44 .44 .62 .62 .62 .62 .78 .78 .78 .78 .9 .9 .9 .9 .98 .98 .98 .98 1 1 1 1 1 1 1 1",
-    textureColorMatrix: "0 0 0 0 0.98 0 0 0 0 0.93 0 0 0 0 0.90 0 0 0 1 0",
+    textureColorMatrix: "0 0 0 0 0.88 0 0 0 0 0.80 0 0 0 0 0.76 0 0 0 1 0",
   },
 };
 
 const sizeTokens: Record<ContourButtonSize, SizeToken> = {
   default: {
-    outerHeight: 48,
+    outerHeight: 44,
     outerWidth: 196,
     padding: 1.5,
     innerPaddingLeft: 12,
     innerPaddingRight: 3,
     iconSize: 28,
     iconGlyph: 13,
-    lineHeight: 2,
     gap: 9,
-    textFontSize: "12px",
-    textLineHeight: "14px",
+    textFontSize: "16px",
+    textLineHeight: "16px",
     textPaddingX: 6,
     iconGap: 6,
   },
   sm: {
-    outerHeight: 34,
+    outerHeight: 30,
     outerWidth: 112,
-    padding: 2,
+    padding: 1.5,
     innerPaddingLeft: 7,
     innerPaddingRight: 3,
     iconSize: 18,
     iconGlyph: 8,
-    lineHeight: 2,
     gap: 3,
-    textFontSize: "8px",
-    textLineHeight: "10px",
+    textFontSize: "12px",
+    textLineHeight: "12px",
     textPaddingX: 3,
     iconGap: 3,
   },
@@ -291,7 +283,6 @@ export const ContourButton = forwardRef<HTMLElement, ContourButtonProps>(
       "--contour-inner-shadow": variantToken.innerShadow,
       "--contour-inner-shadow-hover": variantToken.innerShadowHover,
       "--contour-inner-shadow-press": variantToken.innerShadowPress,
-      "--contour-line": variantToken.lineColor,
       "--contour-text": variantToken.textColor,
       "--contour-text-shadow": variantToken.textShadow,
       "--contour-icon-background": variantToken.iconBackground,
@@ -304,7 +295,6 @@ export const ContourButton = forwardRef<HTMLElement, ContourButtonProps>(
       "--contour-inner-padding-right": `${sizeToken.innerPaddingRight}px`,
       "--contour-icon-size": `${sizeToken.iconSize}px`,
       "--contour-icon-glyph": `${sizeToken.iconGlyph}px`,
-      "--contour-line-height": `${sizeToken.lineHeight}px`,
       "--contour-text-font-size": sizeToken.textFontSize,
       "--contour-text-line-height": sizeToken.textLineHeight,
       "--contour-text-padding-x": `${sizeToken.textPaddingX}px`,
@@ -317,8 +307,7 @@ export const ContourButton = forwardRef<HTMLElement, ContourButtonProps>(
 
     const labelBlock = iconOnly ? null : (
       <span className={styles.track}>
-        {reverse ? <span className={styles.label}>{children}</span> : <span className={styles.line} />}
-        {reverse ? <span className={styles.line} /> : <span className={styles.label}>{children}</span>}
+        <span className={styles.label}>{children}</span>
       </span>
     );
 

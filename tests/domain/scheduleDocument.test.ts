@@ -1,8 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { createDefaultSchedule } from "../../src/domain/createDefaultSchedule";
 import {
+  addInfrastructureComponent,
+  addPosterComponent,
+  addRoom,
   assignOperator,
   clearSlot,
+  moveRoom,
+  resizeRoom,
+  setRoomProduct,
   setSlotElitePhase,
   setLayout,
   setQueueCount,
@@ -16,6 +22,8 @@ describe("schedule document operations", () => {
     const parsed = JSON.parse(JSON.stringify(document)) as unknown;
 
     expect(validateScheduleDocument(parsed)).toBe(true);
+    expect(document.version).toBe(2);
+    expect(document.canvas.rooms).toHaveLength(12);
   });
 
   it("assigns, clears, and swaps slots", () => {
@@ -90,7 +98,155 @@ describe("schedule document operations", () => {
     const document = createDefaultSchedule("243", 2);
 
     expect(setQueueCount(document, 0).queues).toHaveLength(1);
-    expect(setQueueCount(document, 4).queues).toHaveLength(3);
-    expect(setQueueCount(document, 5).queueCount).toBe(3);
+    expect(setQueueCount(document, 4).queues).toHaveLength(4);
+    expect(setQueueCount(document, 5).queueCount).toBe(4);
+  });
+
+  it("moves and resizes shared canvas rooms without changing assignments", () => {
+    const document = createDefaultSchedule("243", 2);
+    const room = document.canvas.rooms.find((item) => item.roomNodeId === "power-1")!;
+    const assignmentBefore = document.queues[0].roomAssignments.find(
+      (assignment) => assignment.roomNodeId === room.roomNodeId,
+    )!;
+    const moved = moveRoom(document, room.roomNodeId, { ...room.rect, x: 5, y: 3 });
+    const movedRoom = moved.canvas.rooms.find((item) => item.roomNodeId === room.roomNodeId)!;
+    const resized = resizeRoom(moved, room.roomNodeId, {
+      ...movedRoom.rect,
+      w: room.rect.w + 1,
+      h: room.rect.h,
+    });
+
+    expect(resized.canvas.rooms.find((item) => item.roomNodeId === room.roomNodeId)?.rect.x).toBe(5);
+    expect(resized.queues[0].roomAssignments.find((assignment) => assignment.roomNodeId === room.roomNodeId)).toEqual(
+      assignmentBefore,
+    );
+  });
+
+  it("keeps fixed one-cell facilities from resizing", () => {
+    const document = createDefaultSchedule("243", 1);
+    const room = document.canvas.rooms.find((item) => item.roomNodeId === "power-1")!;
+    const resized = resizeRoom(document, room.roomNodeId, { ...room.rect, w: 2, h: 2 });
+
+    expect(resized.canvas.rooms.find((item) => item.roomNodeId === room.roomNodeId)?.rect).toEqual(room.rect);
+  });
+
+  it("ignores trading product changes and keeps trading rooms on money", () => {
+    const document = createDefaultSchedule("243", 2);
+    const trading = document.canvas.rooms.find((item) => item.roomType === "TRADING")!;
+    const changed = setRoomProduct(document, trading.roomNodeId, "CombatRecord");
+
+    expect(changed.canvas.rooms.find((item) => item.roomNodeId === trading.roomNodeId)?.product).toBe("Money");
+    expect(
+      changed.queues.every((queue) =>
+        queue.roomAssignments
+          .filter((assignment) => assignment.roomNodeId === trading.roomNodeId)
+          .every((assignment) => assignment.product === "Money"),
+      ),
+    ).toBe(true);
+  });
+
+  it("updates manufacturing product across every queue assignment", () => {
+    const document = createDefaultSchedule("243", 3);
+    const manufacture = document.canvas.rooms.find((item) => item.roomType === "MANUFACTURE")!;
+    const changed = setRoomProduct(document, manufacture.roomNodeId, "CombatRecord");
+
+    expect(changed.canvas.rooms.find((item) => item.roomNodeId === manufacture.roomNodeId)?.product).toBe(
+      "CombatRecord",
+    );
+    expect(
+      changed.queues.every((queue) =>
+        queue.roomAssignments
+          .filter((assignment) => assignment.roomNodeId === manufacture.roomNodeId)
+          .every((assignment) => assignment.product === "CombatRecord"),
+      ),
+    ).toBe(true);
+  });
+
+  it("adds an infrastructure poster component from an empty facility canvas", () => {
+    const document = createDefaultSchedule("243", 3);
+    const emptyDocument = {
+      ...document,
+      canvas: {
+        ...document.canvas,
+        rooms: [],
+      },
+      queues: document.queues.map((queue) => ({
+        ...queue,
+        roomAssignments: [],
+      })),
+      posterCanvas: undefined,
+    };
+
+    const next = addInfrastructureComponent(emptyDocument, "TRADING");
+
+    expect(next.canvas.rooms).toHaveLength(1);
+    expect(next.canvas.rooms[0]).toMatchObject({ roomType: "TRADING", roomIndex: 1 });
+    expect(next.queues.every((queue) => queue.roomAssignments.length === 1)).toBe(true);
+    expect(next.posterCanvas?.components.at(-1)).toMatchObject({
+      type: "infrastructure",
+      roomType: "TRADING",
+      roomNodeId: next.canvas.rooms[0].roomNodeId,
+    });
+    expect(next.posterCanvas?.components.at(-1)?.rect).toMatchObject({
+      w: expect.any(Number),
+      h: expect.any(Number),
+    });
+    expect(next.posterCanvas!.components.at(-1)!.rect.w).toBeLessThanOrEqual(1800);
+    expect(next.posterCanvas!.components.at(-1)!.rect.h).toBeLessThanOrEqual(900);
+    expect(validateScheduleDocument(next)).toBe(true);
+  });
+
+  it("places dragged poster and room components near the drop center", () => {
+    const poster = addPosterComponent(createDefaultSchedule("243", 3), "note", { x: 5000, y: 5000 });
+    expect(poster.posterCanvas?.components.at(-1)?.rect).toMatchObject({
+      x: 3700,
+      y: 4450,
+      w: 2600,
+      h: 1100,
+    });
+
+    const document = createDefaultSchedule("243", 3);
+    const emptyDocument = {
+      ...document,
+      canvas: {
+        ...document.canvas,
+        rooms: [],
+      },
+      queues: document.queues.map((queue) => ({
+        ...queue,
+        roomAssignments: [],
+      })),
+      posterCanvas: undefined,
+    };
+
+    const infrastructure = addInfrastructureComponent(emptyDocument, "TRADING", { x: 8000, y: 7000 });
+    expect(infrastructure.posterCanvas?.components.at(-1)?.rect).toMatchObject({
+      x: 7250,
+      y: 6620,
+      w: 1500,
+      h: 760,
+    });
+
+    const room = addRoom(emptyDocument, "POWER", { x: 5.5, y: 3.5 });
+    expect(room.canvas.rooms.at(-1)?.rect).toEqual({
+      x: 5,
+      y: 3,
+      w: 1,
+      h: 1,
+    });
+  });
+
+  it("binds repeated infrastructure poster components to different matching rooms first", () => {
+    const first = addInfrastructureComponent(createDefaultSchedule("243", 3), "MANUFACTURE");
+    const second = addInfrastructureComponent(first, "MANUFACTURE");
+    const manualComponents = second.posterCanvas!.components.filter(
+      (component) => component.type === "infrastructure" && "roomNodeId" in component,
+    );
+
+    expect(manualComponents).toHaveLength(2);
+    expect(new Set(manualComponents.map((component) => (component as { roomNodeId?: string }).roomNodeId)).size).toBe(
+      2,
+    );
+    expect(validateScheduleDocument(second)).toBe(true);
   });
 });

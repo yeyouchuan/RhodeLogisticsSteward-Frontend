@@ -13,6 +13,7 @@
   background-origin: border-box;
   box-shadow: var(--contour-outer-shadow);
   isolation: isolate;
+  text-align: left;
   touch-action: manipulation;
   transform: translate3d(0, 0, 0) scale(1);
   transition:
@@ -45,11 +46,6 @@
 
 .shell[data-direction="reverse"]:focus-visible .icon {
   transform: translateX(-1px);
-}
-
-.shell:focus-visible .line {
-  opacity: 0.96;
-  transform: scaleX(1.06);
 }
 
 .shell:focus-visible .sheen {
@@ -115,30 +111,17 @@
   display: inline-flex;
   align-items: center;
   flex: 1 1 auto;
-  gap: var(--contour-icon-gap);
+  justify-content: flex-start;
   min-width: 0;
-  margin-inline: var(--contour-icon-gap);
+  margin-inline: 0 var(--contour-icon-gap);
   transition: transform var(--motion-enter-fast) var(--motion-ease-enter);
-}
-
-.line {
-  display: inline-block;
-  height: var(--contour-line-height);
-  flex: 1 1 auto;
-  background: var(--contour-line);
-  opacity: 0.74;
-  transform: scaleX(1);
-  transform-origin: center;
-  transition:
-    opacity var(--motion-enter-fast) ease,
-    transform var(--motion-enter-fast) var(--motion-ease-enter);
 }
 
 .label {
   display: inline-block;
   max-width: 100%;
   overflow: hidden;
-  padding: 0 var(--contour-text-padding-x);
+  padding: 0 var(--contour-text-padding-x) 0 0;
   color: var(--contour-text);
   font-size: var(--contour-text-font-size);
   font-weight: 900;
@@ -204,10 +187,6 @@
     transform: translateX(-1px);
   }
 
-  .shell:not(:disabled):not([aria-disabled="true"]):hover .line {
-    opacity: 0.96;
-    transform: scaleX(1.06);
-  }
 }
 
 .shell:not(:disabled):not([aria-disabled="true"]):active {
@@ -223,13 +202,8 @@
 
 .shell:not(:disabled):not([aria-disabled="true"]):active .track,
 .shell:not(:disabled):not([aria-disabled="true"]):active .icon,
-.shell:not(:disabled):not([aria-disabled="true"]):active .label,
-.shell:not(:disabled):not([aria-disabled="true"]):active .line {
+.shell:not(:disabled):not([aria-disabled="true"]):active .label {
   transform: none !important;
-}
-
-.shell:not(:disabled):not([aria-disabled="true"]):active .line {
-  opacity: 1 !important;
 }
 
 .shell[data-size="sm"] .sheen {
@@ -264,13 +238,8 @@
 
 .shell[data-size="sm"]:focus-visible .track,
 .shell[data-size="sm"]:focus-visible .icon,
-.shell[data-size="sm"]:focus-visible .label,
-.shell[data-size="sm"]:focus-visible .line {
+.shell[data-size="sm"]:focus-visible .label {
   transform: none !important;
-}
-
-.shell[data-size="sm"]:focus-visible .line {
-  opacity: 1;
 }
 
 .shell[data-size="sm"]:not(:disabled):not([aria-disabled="true"]):active .inner {
@@ -293,8 +262,7 @@
 
   .shell[data-size="sm"]:not(:disabled):not([aria-disabled="true"]):hover .track,
   .shell[data-size="sm"]:not(:disabled):not([aria-disabled="true"]):hover .icon,
-  .shell[data-size="sm"]:not(:disabled):not([aria-disabled="true"]):hover .label,
-  .shell[data-size="sm"]:not(:disabled):not([aria-disabled="true"]):hover .line {
+  .shell[data-size="sm"]:not(:disabled):not([aria-disabled="true"]):hover .label {
     transform: none !important;
   }
 }
@@ -304,7 +272,6 @@
   .inner,
   .sheen,
   .track,
-  .line,
   .icon {
     transition: none;
   }

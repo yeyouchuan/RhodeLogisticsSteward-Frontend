@@ -1,5 +1,12 @@
-import { createDefaultSchedule } from "../domain/createDefaultSchedule";
-import type { Operator, RoomAssignment, ScheduleDocument, SlotAssignment } from "../domain/types";
+import { createBentoSchedule } from "../domain/createBentoSchedule";
+import type {
+  BentoRoomTypeId,
+  Operator,
+  ProductKind,
+  RoomAssignment,
+  ScheduleDocument,
+  SlotAssignment,
+} from "../domain/types";
 
 type MaaRoomKey =
   | "control"
@@ -40,22 +47,20 @@ interface MaaCustomInfrast {
   plans?: MaaPlan[];
 }
 
-const productMap: Record<string, string> = {
+const productMap: Record<string, ProductKind> = {
   LMD: "Money",
   "Pure Gold": "PureGold",
   "Battle Record": "CombatRecord",
   OriginStone: "OriginStone",
 };
 
-const roomTypeMap: Partial<Record<MaaRoomKey, string>> = {
+const roomTypeMap: Partial<Record<MaaRoomKey, BentoRoomTypeId>> = {
   control: "CONTROL",
   trading: "TRADING",
   manufacture: "MANUFACTURE",
   power: "POWER",
-  dormitory: "DORMITORY",
   meeting: "MEETING",
   hire: "HIRE",
-  training: "TRAINING",
 };
 
 function isMaaCustomInfrast(value: unknown): value is MaaCustomInfrast {
@@ -78,11 +83,11 @@ function inferLayoutId(plans: MaaPlan[]): string {
   return ["153", "243", "252", "333", "342"].includes(inferred) ? inferred : "243";
 }
 
-function normalizeProduct(product?: string): string | undefined {
+function normalizeProduct(product?: string): ProductKind | undefined {
   if (!product) {
     return undefined;
   }
-  return productMap[product] ?? product;
+  return productMap[product] ?? (product as ProductKind);
 }
 
 function operatorNameMap(operators: Operator[]): Map<string, Operator> {
@@ -122,60 +127,6 @@ function setOperators(
   };
 }
 
-function findAssignment(
-  assignments: RoomAssignment[],
-  roomType: string,
-  roomIndex: number,
-  product?: string,
-): RoomAssignment | undefined {
-  return assignments.find(
-    (assignment) =>
-      assignment.roomType === roomType &&
-      assignment.roomIndex === roomIndex &&
-      (assignment.product ?? "") === (product ?? ""),
-  );
-}
-
-function applyRoomList(
-  assignments: RoomAssignment[],
-  key: MaaRoomKey,
-  rooms: MaaRoom[] | undefined,
-  operatorsByName: Map<string, Operator>,
-): RoomAssignment[] {
-  if (!rooms?.length) {
-    return assignments;
-  }
-
-  const roomType = roomTypeMap[key];
-  if (!roomType) {
-    return assignments;
-  }
-
-  const productOrdinals = new Map<string, number>();
-  return rooms.reduce((current, room, index) => {
-    if (room.skip) {
-      return current;
-    }
-
-    const product = normalizeProduct(room.product);
-    const productKey = `${roomType}:${product ?? ""}`;
-    const nextOrdinal = (productOrdinals.get(productKey) ?? 0) + 1;
-    productOrdinals.set(productKey, nextOrdinal);
-
-    const roomIndex = roomType === "MANUFACTURE" || roomType === "TRADING" ? nextOrdinal : index + 1;
-    const target = findAssignment(current, roomType, roomIndex, product);
-    if (!target) {
-      return current;
-    }
-
-    return current.map((assignment) =>
-      assignment.assignmentId === target.assignmentId
-        ? setOperators(assignment, room.operators ?? [], operatorsByName)
-        : assignment,
-    );
-  }, assignments);
-}
-
 function queueDuration(plan: MaaPlan, index: number): string {
   const period = plan.period?.[0];
   if (period) {
@@ -197,11 +148,96 @@ function droneSummary(plan: MaaPlan): ScheduleDocument["droneSummary"] {
     };
   }
 
-  const roomLabel = drones?.room === "manufacture" ? "制造站" : drones?.room === "trading" ? "贸易站" : "目标房间";
+  const roomLabel =
+    drones?.room === "manufacture" ? "制造站" : drones?.room === "trading" ? "贸易站" : "目标房间";
   return {
     enabled: Boolean(drones),
     targetRoomLabel: drones ? `${roomLabel} ${drones.index ?? 1}` : "未指定",
-    summaryText: drones ? `无人机加速：${roomLabel} ${drones.index ?? 1}，${drones.order ?? "pre"}` : "无人机加速未指定",
+    summaryText: drones
+      ? `无人机加速：${roomLabel} ${drones.index ?? 1}，${drones.order ?? "pre"}`
+      : "无人机加速未指定",
+  };
+}
+
+function targetAssignments(queueAssignments: RoomAssignment[], roomType: BentoRoomTypeId) {
+  return queueAssignments
+    .filter((assignment) => assignment.roomType === roomType)
+    .sort((first, second) => first.roomIndex - second.roomIndex);
+}
+
+function applyRoomList(
+  document: ScheduleDocument,
+  queueIndex: number,
+  key: MaaRoomKey,
+  rooms: MaaRoom[] | undefined,
+  operatorsByName: Map<string, Operator>,
+): ScheduleDocument {
+  const roomType = roomTypeMap[key];
+  if (!roomType || !rooms?.length) {
+    return document;
+  }
+
+  const activeRooms = rooms.filter((room) => !room.skip);
+  if (activeRooms.length === 0) {
+    return document;
+  }
+
+  const queue = document.queues[queueIndex];
+  if (!queue) {
+    return document;
+  }
+
+  const assignments = targetAssignments(queue.roomAssignments, roomType);
+  const productUpdates = new Map<string, ProductKind | undefined>();
+
+  const nextQueues = document.queues.map((currentQueue, index) => {
+    if (index !== queueIndex) {
+      return currentQueue;
+    }
+
+    return {
+      ...currentQueue,
+      roomAssignments: currentQueue.roomAssignments.map((assignment) => {
+        const targetIndex = assignments.findIndex((target) => target.assignmentId === assignment.assignmentId);
+        const room = activeRooms[targetIndex];
+        if (targetIndex < 0 || !room) {
+          return assignment;
+        }
+
+        const product =
+          roomType === "TRADING"
+            ? "Money"
+            : roomType === "MANUFACTURE"
+              ? normalizeProduct(room.product) ?? assignment.product
+              : assignment.product;
+        productUpdates.set(assignment.roomNodeId, product);
+
+        return {
+          ...setOperators(assignment, room.operators ?? [], operatorsByName),
+          product,
+        };
+      }),
+    };
+  });
+
+  return {
+    ...document,
+    canvas: {
+      ...document.canvas,
+      rooms: document.canvas.rooms.map((room) =>
+        productUpdates.has(room.roomNodeId)
+          ? { ...room, product: productUpdates.get(room.roomNodeId) }
+          : room,
+      ),
+    },
+    queues: nextQueues.map((currentQueue) => ({
+      ...currentQueue,
+      roomAssignments: currentQueue.roomAssignments.map((assignment) =>
+        productUpdates.has(assignment.roomNodeId)
+          ? { ...assignment, product: productUpdates.get(assignment.roomNodeId) }
+          : assignment,
+      ),
+    })),
   };
 }
 
@@ -215,8 +251,21 @@ export function maaCustomInfrastToScheduleDocument(
 
   const plans = value.plans?.slice(0, 3) ?? [];
   const layoutId = inferLayoutId(plans);
-  const document = createDefaultSchedule(layoutId, Math.max(1, plans.length));
+  let document = createBentoSchedule(layoutId, Math.max(1, plans.length));
   const operatorsByName = operatorNameMap(operators);
+
+  for (const [queueIndex, plan] of plans.entries()) {
+    if (!plan.rooms) {
+      continue;
+    }
+
+    document = applyRoomList(document, queueIndex, "control", plan.rooms.control, operatorsByName);
+    document = applyRoomList(document, queueIndex, "trading", plan.rooms.trading, operatorsByName);
+    document = applyRoomList(document, queueIndex, "manufacture", plan.rooms.manufacture, operatorsByName);
+    document = applyRoomList(document, queueIndex, "power", plan.rooms.power, operatorsByName);
+    document = applyRoomList(document, queueIndex, "meeting", plan.rooms.meeting, operatorsByName);
+    document = applyRoomList(document, queueIndex, "hire", plan.rooms.hire, operatorsByName);
+  }
 
   return {
     ...document,
@@ -225,25 +274,10 @@ export function maaCustomInfrastToScheduleDocument(
     authorText: value.author ?? document.authorText,
     queues: document.queues.map((queue, index) => {
       const plan = plans[index];
-      if (!plan?.rooms) {
-        return queue;
-      }
-
-      let roomAssignments = queue.roomAssignments;
-      roomAssignments = applyRoomList(roomAssignments, "control", plan.rooms.control, operatorsByName);
-      roomAssignments = applyRoomList(roomAssignments, "trading", plan.rooms.trading, operatorsByName);
-      roomAssignments = applyRoomList(roomAssignments, "manufacture", plan.rooms.manufacture, operatorsByName);
-      roomAssignments = applyRoomList(roomAssignments, "power", plan.rooms.power, operatorsByName);
-      roomAssignments = applyRoomList(roomAssignments, "dormitory", plan.rooms.dormitory, operatorsByName);
-      roomAssignments = applyRoomList(roomAssignments, "meeting", plan.rooms.meeting, operatorsByName);
-      roomAssignments = applyRoomList(roomAssignments, "hire", plan.rooms.hire, operatorsByName);
-      roomAssignments = applyRoomList(roomAssignments, "training", plan.rooms.training, operatorsByName);
-
       return {
         ...queue,
-        label: plan.name ?? queue.label,
-        durationLabel: queueDuration(plan, index),
-        roomAssignments,
+        label: plan?.name ?? queue.label,
+        durationLabel: plan ? queueDuration(plan, index) : queue.durationLabel,
       };
     }),
     productionSummary: {

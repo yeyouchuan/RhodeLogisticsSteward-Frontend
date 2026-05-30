@@ -18,10 +18,10 @@
 
 .frame[data-variant="tile"] .portrait,
 .frame[data-variant="drag"] .portrait {
-  width: 112%;
-  height: 112%;
-  object-fit: cover;
-  object-position: center 18%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .fallback {

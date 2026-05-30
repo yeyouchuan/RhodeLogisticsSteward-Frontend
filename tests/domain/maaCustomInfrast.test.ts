@@ -30,15 +30,14 @@ const operators: Operator[] = [
 ];
 
 describe("maaCustomInfrastToScheduleDocument", () => {
-  it("converts MAA 243 custom_infrast plans into schedule queues", () => {
+  it("converts MAA 243 custom_infrast plans into v2 bento queues", () => {
     const document = maaCustomInfrastToScheduleDocument(
       {
-        title: "243-高配3队简化率",
-        author: "一只摆烂的42",
+        title: "243",
+        author: "Doctor",
         plans: [
           {
-            name: "12H第一班",
-            description: "下次在12小时后换班",
+            name: "First",
             drones: { room: "manufacture", index: 1, enable: true, order: "pre" },
             rooms: {
               control: [{ operators: ["阿米娅"] }],
@@ -55,22 +54,25 @@ describe("maaCustomInfrastToScheduleDocument", () => {
               power: [{ operators: ["承曦格雷伊"] }, { operators: ["烛煌"] }, { operators: ["格雷伊"] }],
             },
           },
-          { name: "12H第二班", rooms: {} },
-          { name: "12H第三班", rooms: {} },
+          { name: "Second", rooms: {} },
+          { name: "Third", rooms: {} },
         ],
       },
       operators,
     );
 
+    expect(document?.version).toBe(2);
     expect(document?.layoutId).toBe("243");
     expect(document?.queueCount).toBe(3);
-    expect(document?.queues[0].label).toBe("12H第一班");
-    expect(document?.authorText).toBe("一只摆烂的42");
+    expect(document?.canvas.rooms).toHaveLength(12);
+    expect(document?.queues[0].label).toBe("First");
+    expect(document?.authorText).toBe("Doctor");
     expect(document?.droneSummary.targetRoomLabel).toBe("制造站 1");
 
     const trade = document?.queues[0].roomAssignments.find(
       (assignment) => assignment.roomType === "TRADING" && assignment.roomIndex === 1,
     );
+    expect(trade?.roomNodeId).toBe("trading-1");
     expect(trade?.operators[0].operatorId).toBe("op-blacknight");
     expect(trade?.operators[1].operatorId).toBe("op-jixing");
     expect(trade?.operators[2].overrideName).toBe("可露希尔");
@@ -89,7 +91,7 @@ describe("maaCustomInfrastToScheduleDocument", () => {
   it("infers 153 layout from one trade, five manufacturing and three power rooms", () => {
     const document = maaCustomInfrastToScheduleDocument(
       {
-        title: "153 极限效率",
+        title: "153",
         plans: [
           {
             name: "A+B 16H",
@@ -116,12 +118,10 @@ describe("maaCustomInfrastToScheduleDocument", () => {
     expect(assignments.filter((assignment) => assignment.roomType === "MANUFACTURE")).toHaveLength(5);
     expect(assignments.filter((assignment) => assignment.roomType === "POWER")).toHaveLength(3);
 
-    const fourthRecord = assignments.find(
-      (assignment) =>
-        assignment.roomType === "MANUFACTURE" &&
-        assignment.product === "CombatRecord" &&
-        assignment.roomIndex === 4,
+    const fifthManufacture = assignments.find(
+      (assignment) => assignment.roomType === "MANUFACTURE" && assignment.roomIndex === 5,
     );
-    expect(fourthRecord?.operators[2].overrideName).toBe("掠风");
+    expect(fifthManufacture?.product).toBe("CombatRecord");
+    expect(fifthManufacture?.operators[2].overrideName).toBe("掠风");
   });
 });

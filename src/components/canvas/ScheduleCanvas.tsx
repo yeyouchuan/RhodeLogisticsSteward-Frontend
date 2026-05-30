@@ -1,10 +1,21 @@
 import { forwardRef, useMemo } from "react";
-import { getLayoutPreset } from "../../data/layoutPresets";
+import {
+  findIncompleteRoomTypes,
+  type PosterComponentAddKind,
+  type PosterComponentContentPatch,
+} from "../../domain/scheduleDocument";
 import { withMockCalculations } from "../../domain/mockCalculator";
-import type { BuildingReference, Operator, ScheduleDocument, SlotAddress } from "../../domain/types";
+import type {
+  BuildingReference,
+  GridRect,
+  Operator,
+  PosterRect,
+  ProductKind,
+  ScheduleDocument,
+  SlotAddress,
+} from "../../domain/types";
 import styles from "../../styles/canvas.module.css";
-import { CanvasHeader } from "./CanvasHeader";
-import { QueueRow } from "./QueueRow";
+import { PosterCanvas } from "./PosterCanvas";
 
 interface ScheduleCanvasProps {
   document: ScheduleDocument;
@@ -20,12 +31,26 @@ interface ScheduleCanvasProps {
     productionSummary?: Partial<ScheduleDocument["productionSummary"]>;
     droneSummary?: Partial<ScheduleDocument["droneSummary"]>;
   }) => void;
-  onQueueChange: (queueId: string, patch: { label?: string; durationLabel?: string }) => void;
-  onRoomLabelsChange: (
-    queueId: string,
-    assignmentId: string,
-    labels: { paperEfficiencyLabel?: string; effectiveEfficiencyLabel?: string; notes?: string[] },
-  ) => void;
+  onActiveQueueChange: (queueId: string) => void;
+  onRoomMove: (roomNodeId: string, rect: GridRect) => void;
+  onRoomResize: (roomNodeId: string, rect: GridRect) => void;
+  onRoomProductChange: (roomNodeId: string, product?: ProductKind) => void;
+  onRoomRemove: (roomNodeId: string) => void;
+  onPosterComponentRectChange: (componentId: string, rect: PosterRect) => void;
+  onPosterComponentContentChange?: (componentId: string, patch: PosterComponentContentPatch) => void;
+  onPosterComponentSelect?: (componentId: string | null) => void;
+  onPosterRegenerate: () => void;
+  onPosterComponentAdd?: (kind: PosterComponentAddKind) => void;
+  onPosterComponentDelete?: (componentId: string) => void;
+  onPosterComponentDuplicate?: (componentId: string) => void;
+  onPosterComponentLayerChange?: (componentId: string, direction: "up" | "down") => void;
+  onPosterUndo?: () => void;
+  onPosterRedo?: () => void;
+  canUndoPoster?: boolean;
+  canRedoPoster?: boolean;
+  posterGuidesVisible?: boolean;
+  posterSnapEnabled?: boolean;
+  selectedPosterComponentId?: string | null;
 }
 
 export const ScheduleCanvas = forwardRef<HTMLDivElement, ScheduleCanvasProps>(
@@ -36,38 +61,60 @@ export const ScheduleCanvas = forwardRef<HTMLDivElement, ScheduleCanvasProps>(
       reference,
       selectedSlot,
       onSlotSelect,
-      onMetadataChange,
-      onQueueChange,
-      onRoomLabelsChange,
+      onRoomMove,
+      onRoomResize,
+      onRoomProductChange,
+      onRoomRemove,
+      onPosterComponentRectChange,
+      onPosterComponentContentChange = () => undefined,
+      onPosterComponentDelete = () => undefined,
+      onPosterComponentDuplicate = () => undefined,
+      onPosterComponentLayerChange = () => undefined,
+      onPosterComponentSelect = () => undefined,
+      posterGuidesVisible = true,
+      posterSnapEnabled = true,
+      selectedPosterComponentId = null,
     },
     ref,
   ) => {
-    const preset = getLayoutPreset(document.layoutId);
     const calculated = useMemo(() => withMockCalculations(document), [document]);
-    const operatorMap = useMemo(
-      () => new Map(operators.map((operator) => [operator.id, operator])),
-      [operators],
-    );
+    const missingRooms = findIncompleteRoomTypes(calculated);
 
     return (
-      <div aria-label="Schedule export canvas" className={styles.canvas} data-canvas-root ref={ref}>
-        <CanvasHeader document={calculated} onMetadataChange={onMetadataChange} />
-        <main className={styles.body}>
-          {calculated.queues.map((queue) => (
-            <QueueRow
-              key={queue.id}
-              onQueueChange={onQueueChange}
-              onRoomLabelsChange={onRoomLabelsChange}
-              onSlotSelect={onSlotSelect}
-              operatorMap={operatorMap}
-              preset={preset}
-              queue={queue}
-              queueCount={calculated.queueCount}
-              reference={reference}
-              selectedSlot={selectedSlot}
-            />
-          ))}
-        </main>
+      <div
+        aria-label="Schedule export canvas"
+        className={styles.canvas}
+        data-canvas-root
+        data-guides-visible={posterGuidesVisible}
+        ref={ref}
+      >
+        <div className={styles.bentoShell}>
+          {missingRooms.length > 0 ? (
+            <div className={styles.validationWarning}>
+              缺少必要设施：{missingRooms.join(", ")}。草稿仍可导出 PNG。
+            </div>
+          ) : null}
+          <PosterCanvas
+            document={calculated}
+            onRoomMove={onRoomMove}
+            onRoomProductChange={onRoomProductChange}
+            onRoomRemove={onRoomRemove}
+            onRoomResize={onRoomResize}
+            onPosterComponentRectChange={onPosterComponentRectChange}
+            onPosterComponentContentChange={onPosterComponentContentChange}
+            onPosterComponentDelete={onPosterComponentDelete}
+            onPosterComponentDuplicate={onPosterComponentDuplicate}
+            onPosterComponentLayerChange={onPosterComponentLayerChange}
+            onPosterComponentSelect={onPosterComponentSelect}
+            posterGuidesVisible={posterGuidesVisible}
+            posterSnapEnabled={posterSnapEnabled}
+            selectedPosterComponentId={selectedPosterComponentId}
+            onSlotSelect={onSlotSelect}
+            operators={operators}
+            reference={reference}
+            selectedSlot={selectedSlot}
+          />
+        </div>
       </div>
     );
   },

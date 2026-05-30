@@ -1,4 +1,3 @@
-import { getLayoutPreset } from "../data/layoutPresets";
 import type { DroneSummary, ProductionSummary, RoomAssignment, ScheduleDocument } from "./types";
 
 export function calculateRoomPaperEfficiency(assignment: RoomAssignment): string {
@@ -26,8 +25,7 @@ export function calculateProductionSummary(document: ScheduleDocument): Producti
     return document.productionSummary;
   }
 
-  const preset = getLayoutPreset(document.layoutId);
-  const roomCount = preset.columns.reduce((sum, column) => sum + column.roomsPerQueue.length, 0);
+  const roomCount = document.canvas.rooms.length;
   const filledSlots = document.queues.reduce(
     (sum, queue) =>
       sum +
@@ -48,7 +46,7 @@ export function calculateProductionSummary(document: ScheduleDocument): Producti
     orderText: `订单 ${order}w`,
     goldText: `赤金 ${gold}w`,
     recordText: `经验 ${record}w`,
-    customLine: document.productionSummary.customLine ?? "mock 估算，非真实游戏公式",
+    customLine: document.productionSummary.customLine ?? "mock estimate, not an in-game formula",
   };
 }
 
@@ -61,7 +59,7 @@ export function calculateDroneSummary(document: ScheduleDocument): DroneSummary 
 
   return {
     ...document.droneSummary,
-    summaryText: `无人机加速：${document.droneSummary.targetRoomLabel} 模拟 +${value}w 订单等效`,
+    summaryText: `无人机加速：${document.droneSummary.targetRoomLabel} 模拟 +${value}w 等效订单`,
   };
 }
 

@@ -39,7 +39,7 @@ export function CanvasHeader({ document, onMetadataChange }: CanvasHeaderProps) 
           value={document.subtitle}
         />
       </div>
-      <div className={styles.summary} aria-label="生产摘要">
+      <div aria-label="生产摘要" className={styles.summary}>
         <div className={styles.productionLine}>
           <span className={styles.summaryLabel}>产出计算</span>
           <EditableText
