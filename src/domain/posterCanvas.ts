@@ -18,7 +18,7 @@ export const MIN_POSTER_COMPONENT_SIZE = 400;
 const MIN_POSTER_DIVIDER_HEIGHT = 120;
 const POSTER_MARGIN = 220;
 const POSTER_DIVIDER_TOP = 1080;
-const POSTER_SECTION_TOP = 1260;
+const POSTER_SECTION_TOP = 980;
 
 export const DEFAULT_POSTER_COMPONENT_RECTS = {
   title: { x: POSTER_MARGIN, y: 180, w: 2700, h: 640 },
@@ -175,13 +175,6 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
       metricId: "drone",
       rect: DEFAULT_POSTER_COMPONENT_RECTS.drone,
       zIndex: 10,
-    },
-    {
-      id: "divider:header",
-      type: "divider",
-      title: "分隔线",
-      rect: DEFAULT_POSTER_COMPONENT_RECTS.divider,
-      zIndex: 5,
     },
   );
 

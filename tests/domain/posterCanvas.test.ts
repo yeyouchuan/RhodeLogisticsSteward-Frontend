@@ -22,8 +22,9 @@ describe("poster canvas", () => {
     expect(canvas.schemaVersion).toBe(2);
     expect(canvas.sourceTemplateId).toBe("matrix");
     expect(canvas.components.map((component) => component.type)).toEqual(
-      expect.arrayContaining(["infrastructure", "metric", "divider"]),
+      expect.arrayContaining(["infrastructure", "metric"]),
     );
+    expect(canvas.components.map((component) => component.type)).not.toEqual(expect.arrayContaining(["divider"]));
     expect(canvas.components.map((component) => component.type)).not.toEqual(expect.arrayContaining(["laneLabel"]));
     expect(canvas.components.map((component) => component.type)).not.toEqual(expect.arrayContaining(["note"]));
     expect(canvas.components.map((component) => component.type)).not.toEqual(
@@ -40,12 +41,9 @@ describe("poster canvas", () => {
       expect.arrayContaining(["metric:title", "metric:production", "metric:drone"]),
     );
     expect(canvas.components.map((component) => component.id)).not.toEqual(expect.arrayContaining(["note:summary"]));
+    expect(canvas.components.map((component) => component.id)).not.toEqual(expect.arrayContaining(["divider:header"]));
     expect(canvas.components.find((component) => component.id === "metric:title")?.title).toBe(document.title);
     expect(canvas.components.find((component) => component.id === "metric:production")?.rect.h).toBe(640);
-    expect(canvas.components.find((component) => component.id === "divider:header")?.rect).toMatchObject({
-      y: 1080,
-      h: 120,
-    });
 
     const facilityGroups = canvas.components
       .filter((component) => component.type === "infrastructure" && component.sectionId)
@@ -54,8 +52,8 @@ describe("poster canvas", () => {
     expect(canvas.components.filter((component) => component.type === "laneLabel")).toHaveLength(0);
     expect(facilityGroups.length).toBeGreaterThan(1);
     expect(facilityGroups[0].rect).toMatchObject({
-      y: 1260,
-      h: 8520,
+      y: 980,
+      h: 8800,
     });
     for (let index = 1; index < facilityGroups.length; index += 1) {
       const previous = facilityGroups[index - 1].rect;

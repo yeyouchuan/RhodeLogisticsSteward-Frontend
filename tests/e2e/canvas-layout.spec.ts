@@ -82,7 +82,7 @@ test("sample 153 renders the smart matrix poster with four queues visible", asyn
 
   await expect(page.locator("[data-poster-canvas]")).toBeVisible();
   await expect(page.locator("[data-poster-canvas]")).toHaveAttribute("data-poster-template", "matrix");
-  await expect.poll(async () => page.locator("[data-poster-component]").count()).toBe(10);
+  await expect.poll(async () => page.locator("[data-poster-component]").count()).toBe(9);
   await expect(page.locator("[data-poster-lane]")).toHaveCount(0);
   await expect(page.getByText("队列 4")).toHaveCount(0);
   await expect(page.locator("[data-poster-slot]")).toHaveCount(116);
@@ -176,7 +176,7 @@ test("free poster components can be dragged, undone, cleared, and regenerated", 
   await expect(page.locator("[data-poster-component]")).toHaveCount(0);
 
   await page.getByRole("button", { name: "重排海报" }).click();
-  await expect.poll(async () => page.locator("[data-poster-component]").count()).toBe(10);
+  await expect.poll(async () => page.locator("[data-poster-component]").count()).toBe(9);
 });
 
 test("free poster components resize from selected edge handles", async ({ page }) => {
