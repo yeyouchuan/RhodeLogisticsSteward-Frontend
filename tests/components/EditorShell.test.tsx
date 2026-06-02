@@ -111,7 +111,7 @@ describe("EditorShell layout space controls", () => {
     fireEvent.click(component);
 
     const toolbar = container.querySelector("[data-poster-editor-toolbar]") as HTMLElement;
-    for (const label of ["重排海报", "撤销", "清空", "隐藏参考线"]) {
+    for (const label of ["重排海报", "撤销", "重做", "清空", "隐藏参考线"]) {
       expect(within(toolbar).getByRole("button", { name: label })).toHaveAttribute("data-size", "sm");
     }
     expect(toolbar).not.toHaveTextContent("已选中");
@@ -124,7 +124,7 @@ describe("EditorShell layout space controls", () => {
 
     await waitFor(() => expect(container.querySelector("[data-poster-component]")).toBeInTheDocument());
     expect(container.querySelectorAll("[data-poster-component]").length).toBeGreaterThan(0);
-    expect(screen.queryByRole("button", { name: "重做" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "重做" })).toBeDisabled();
 
     const clearButton = screen.getByRole("button", { name: "清空" });
     expect(clearButton).toHaveAttribute("data-poster-clear-canvas", "true");

@@ -16,7 +16,9 @@ import type {
 export const POSTER_COORD_MAX = 10000;
 export const MIN_POSTER_COMPONENT_SIZE = 400;
 const POSTER_MARGIN = 220;
-const POSTER_SECTION_TOP = 1640;
+const POSTER_LANE_TOP = 1120;
+const POSTER_DIVIDER_TOP = 1540;
+const POSTER_SECTION_TOP = 2020;
 
 const componentTypes = [
   "infrastructure",
@@ -166,10 +168,31 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
       id: "divider:header",
       type: "divider",
       title: "分隔线",
-      rect: { x: POSTER_MARGIN, y: 1120, w: POSTER_COORD_MAX - POSTER_MARGIN * 2, h: 400 },
+      rect: { x: POSTER_MARGIN, y: POSTER_DIVIDER_TOP, w: POSTER_COORD_MAX - POSTER_MARGIN * 2, h: 400 },
       zIndex: 5,
     },
   );
+
+  const laneCount = Math.max(1, view.lanes.length);
+  const laneWidth = Math.floor((POSTER_COORD_MAX - POSTER_MARGIN * 2) / laneCount);
+  view.lanes.forEach((lane, index) => {
+    const x = POSTER_MARGIN + laneWidth * index;
+
+    components.push({
+      id: componentId(`lane:${lane.id}`),
+      type: "laneLabel",
+      title: lane.label,
+      text: lane.durationLabel,
+      laneId: lane.id,
+      rect: {
+        x,
+        y: POSTER_LANE_TOP,
+        w: index === laneCount - 1 ? POSTER_COORD_MAX - POSTER_MARGIN - x : laneWidth,
+        h: 400,
+      },
+      zIndex: 12 + index,
+    });
+  });
 
   view.sections.forEach((section, index) => {
     components.push({

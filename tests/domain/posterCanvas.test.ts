@@ -22,10 +22,7 @@ describe("poster canvas", () => {
     expect(canvas.schemaVersion).toBe(2);
     expect(canvas.sourceTemplateId).toBe("matrix");
     expect(canvas.components.map((component) => component.type)).toEqual(
-      expect.arrayContaining(["infrastructure", "metric", "note", "divider"]),
-    );
-    expect(canvas.components.map((component) => component.type)).not.toEqual(
-      expect.arrayContaining(["laneLabel"]),
+      expect.arrayContaining(["infrastructure", "laneLabel", "metric", "note", "divider"]),
     );
     expect(canvas.components.map((component) => component.type)).not.toEqual(
       expect.arrayContaining(["facility", "facilityGroup"]),
@@ -46,7 +43,7 @@ describe("poster canvas", () => {
       .filter((component) => component.type === "infrastructure" && component.sectionId)
       .sort((first, second) => first.rect.x - second.rect.x);
 
-    expect(canvas.components.some((component) => component.type === "laneLabel")).toBe(false);
+    expect(canvas.components.filter((component) => component.type === "laneLabel")).toHaveLength(3);
     expect(facilityGroups.length).toBeGreaterThan(1);
     for (let index = 1; index < facilityGroups.length; index += 1) {
       const previous = facilityGroups[index - 1].rect;
@@ -78,7 +75,7 @@ describe("poster canvas", () => {
           .filter((component) => component.type === "infrastructure" && component.sectionId)
           .sort((first, second) => first.rect.x - second.rect.x);
 
-        expect(canvas.components.some((component) => component.type === "laneLabel")).toBe(false);
+        expect(canvas.components.filter((component) => component.type === "laneLabel")).toHaveLength(queueCount);
         expect(facilityGroups.length, `${layoutId}/${queueCount}`).toBeGreaterThan(1);
 
         for (let index = 1; index < facilityGroups.length; index += 1) {

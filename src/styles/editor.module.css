@@ -398,10 +398,61 @@
   gap: 8px;
 }
 
+.filterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.filterToggle {
+  min-height: 22px;
+  border: 1px solid rgba(80, 92, 84, 0.34);
+  border-radius: var(--radius-xs);
+  padding: 2px 7px;
+  color: #35443d;
+  background: #eef1e8;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 900;
+}
+
 .chipGrid {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+}
+
+.selectedChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 30px;
+  align-items: center;
+  border: 1px solid rgba(80, 92, 84, 0.24);
+  border-radius: var(--radius-sm);
+  padding: 5px;
+  background: rgba(238, 241, 232, 0.68);
+}
+
+.selectedChip {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  border: 1px solid #7d907f;
+  border-radius: 999px;
+  padding: 3px 9px;
+  color: #193f33;
+  background: #dce9d9;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.selectedChip::after {
+  margin-left: 5px;
+  color: #637169;
+  content: "×";
 }
 
 .chip {
@@ -433,6 +484,28 @@
   color: var(--color-muted);
   font-size: 12px;
   font-weight: 900;
+}
+
+.emptyHint,
+.operatorEmptyState {
+  border: 1px dashed rgba(80, 92, 84, 0.34);
+  border-radius: var(--radius-sm);
+  color: #58665f;
+  background: rgba(238, 241, 232, 0.62);
+  font-size: 12px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.emptyHint {
+  padding: 8px 10px;
+}
+
+.operatorEmptyState {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  padding: 18px;
 }
 
 .operatorGrid {
@@ -574,6 +647,28 @@
   background: #fff0e8;
   font-size: 13px;
   font-weight: 800;
+}
+
+.notice {
+  border: 1px solid #6f8f6a;
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
+  color: #254d2f;
+  background: #edf7e9;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.dropZone {
+  display: block;
+  border: 2px dashed #9f3131;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  color: #8f2528;
+  background: #fff0e8;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
 }
 
 .dialogBackdrop {

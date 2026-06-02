@@ -23,6 +23,7 @@ interface DragDropProviderProps {
   onAddInfrastructureComponent: (roomType: BentoRoomTypeId, center?: Pick<PosterRect, "x" | "y">) => void;
   onAddPosterComponent: (kind: PosterComponentAddKind, center?: Pick<PosterRect, "x" | "y">) => void;
   onMoveRoom: (roomNodeId: string, rect: GridRect) => void;
+  onClearSlot?: (address: SlotAddress) => void;
 }
 
 interface ClientPoint {
@@ -188,6 +189,7 @@ export function DragDropProvider({
   onAddInfrastructureComponent,
   onAddPosterComponent,
   onMoveRoom,
+  onClearSlot,
 }: DragDropProviderProps) {
   const [activeOperator, setActiveOperator] = useState<Operator | null>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
@@ -203,6 +205,11 @@ export function DragDropProvider({
     const over = event.over?.data.current;
 
     if (!active) {
+      return;
+    }
+
+    if (event.over?.id === "clear-zone" && active.type === "assigned" && isSlotAddress(active.address)) {
+      onClearSlot?.(active.address);
       return;
     }
 

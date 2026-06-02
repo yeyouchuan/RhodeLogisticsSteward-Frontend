@@ -570,49 +570,6 @@ export function PosterCanvas({
     );
   }
 
-  function blocksForRoom(room: BentoRoomNode): PosterBlock[] {
-    return view.sections.flatMap((section) =>
-      section.blocks.filter((block) => block.roomNodeId === room.roomNodeId),
-    );
-  }
-
-  function renderInfrastructureRoom(component: PosterComponent, room: BentoRoomNode) {
-    const lanes = view.mode === "combo" ? view.lanes.slice(0, 3) : view.lanes;
-    const blocks = blocksForRoom(room);
-    const product = room.roomType === "TRADING" ? "Money" : blocks[0]?.product ?? room.product;
-    const maxBlocksPerLane = Math.max(1, ...lanes.map((lane) => blocks.filter((block) => block.laneId === lane.id).length));
-
-    if (blocks.length === 0) {
-      return renderCompactInfrastructureRoom(component, room);
-    }
-
-    return (
-      <div className={styles.posterFacilityGroupBody} data-poster-single-room>
-        <header className={styles.posterSectionHeader}>
-          <span>{room.label || component.title}</span>
-          {product ? <span>{productLabel(product)}</span> : null}
-        </header>
-        <div
-          className={styles.posterSectionRows}
-          style={{
-            "--poster-lane-count": lanes.length,
-            "--poster-room-stack-size": maxBlocksPerLane,
-          } as PosterStyle}
-        >
-          {lanes.map((lane) => {
-            const block = blocks.find((candidate) => candidate.laneId === lane.id);
-
-            return (
-              <div className={styles.posterSectionLane} key={lane.id}>
-                {block ? renderBlock(block) : null}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
-
   function renderComponentBody(component: PosterComponent) {
     if (component.type === "infrastructure" && component.sectionId) {
       const section = sectionMap.get(component.sectionId);
@@ -621,7 +578,7 @@ export function PosterCanvas({
 
     if (component.type === "infrastructure") {
       const room = roomForInfrastructureComponent(component);
-      return room ? renderInfrastructureRoom(component, room) : null;
+      return room ? renderCompactInfrastructureRoom(component, room) : null;
     }
 
     if (component.type === "metric" || component.type === "note") {

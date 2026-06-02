@@ -1,3 +1,4 @@
+import { useDroppable } from "@dnd-kit/core";
 import { Switch } from "@base-ui/react/switch";
 import { MinusIcon, PlusIcon, SidebarSimpleIcon } from "@phosphor-icons/react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -36,6 +37,23 @@ const POSTER_TOOLBAR_BUTTON_STYLE = { width: 92, minWidth: 92 } satisfies CSSPro
 const POSTER_TOOLBAR_SHORT_BUTTON_STYLE = { width: 70, minWidth: 70 } satisfies CSSProperties;
 const POSTER_TOOLBAR_WIDE_BUTTON_STYLE = { width: 100, minWidth: 100 } satisfies CSSProperties;
 
+function ClearDropZone() {
+  const { setNodeRef, isOver } = useDroppable({
+    id: "clear-zone",
+    data: { type: "clear" },
+  });
+
+  return (
+    <div
+      className={styles.dropZone}
+      data-over={isOver}
+      ref={setNodeRef}
+    >
+      拖到这里清空槽位
+    </div>
+  );
+}
+
 function getInitialSidebarCollapsed(): boolean {
   if (typeof window === "undefined") {
     return false;
@@ -67,6 +85,7 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
   const [selectedSlot, setSelectedSlot] = useState<SlotAddress | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [fitZoom, setFitZoom] = useState(1);
   const [zoomOffset, setZoomOffset] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(getInitialSidebarCollapsed);
@@ -177,11 +196,13 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
     }
 
     try {
-      const next = await importScheduleJson(file, operators);
-      store.replaceDocument(next);
+      const result = await importScheduleJson(file, operators);
+      store.replaceDocument(result.document);
       setError("");
+      setNotice(result.message ?? "");
     } catch (importError) {
-      setError(importError instanceof Error ? importError.message : "导入失败。");
+      setError(importError instanceof Error ? importError.message : "导入失败");
+      setNotice("");
     }
   }
 
@@ -286,6 +307,16 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
           </ContourButton>
           <ContourButton
             className={styles.posterToolbarContourButton}
+            disabled={!store.canRedoPosterCanvas}
+            onClick={store.redoPosterCanvas}
+            size="sm"
+            style={POSTER_TOOLBAR_SHORT_BUTTON_STYLE}
+            variant="white"
+          >
+            重做
+          </ContourButton>
+          <ContourButton
+            className={styles.posterToolbarContourButton}
             data-poster-clear-canvas
             onClick={() => {
               store.clearPosterCanvas();
@@ -345,6 +376,7 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
         onAddInfrastructureComponent={store.addInfrastructureComponent}
         onAddPosterComponent={store.addPosterComponent}
         onAssignOperator={assignToAddress}
+        onClearSlot={(address) => store.clearSlot(address.queueId, address.assignmentId, address.slotIndex)}
         onMoveRoom={store.moveRoom}
         onSwapSlots={store.swapSlots}
       >
@@ -420,7 +452,9 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
               </div>
             ) : null}
             {error ? <div className={styles.error}>{error}</div> : null}
+            {!error && notice ? <div className={styles.notice}>{notice}</div> : null}
             {renderPosterEditorToolbar()}
+            <ClearDropZone />
             <div className={styles.canvasScroller} data-canvas-scroller ref={canvasScrollerRef}>
               <div
                 className={styles.canvasFrame}
@@ -430,9 +464,6 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
                 <div className={styles.canvasScale} style={{ transform: `scale(${zoom})` }}>
                   <ScheduleCanvas
                     document={store.document}
-                    onActiveQueueChange={store.setActiveQueue}
-                    onMetadataChange={store.updateMetadata}
-                    onPosterComponentAdd={store.addPosterComponent}
                     onPosterComponentDelete={(componentId) => {
                       store.deletePosterComponent(componentId);
                       setSelectedPosterComponentId((current) => (current === componentId ? null : current));
@@ -442,8 +473,6 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
                     onPosterComponentContentChange={store.updatePosterComponentContent}
                     onPosterComponentRectChange={store.updatePosterComponentRect}
                     onPosterComponentSelect={setSelectedPosterComponentId}
-                    onPosterRegenerate={store.regeneratePosterCanvas}
-                    onPosterUndo={store.undoPosterCanvas}
                     onRoomMove={store.moveRoom}
                     onRoomProductChange={store.setRoomProduct}
                     onRoomRemove={store.removeRoom}
@@ -457,7 +486,6 @@ export function EditorShell({ initialDocument }: EditorShellProps) {
                     ref={canvasRef}
                     selectedSlot={selectedSlot}
                     selectedPosterComponentId={selectedPosterComponentId}
-                    canUndoPoster={store.canUndoPosterCanvas}
                     posterGuidesVisible={posterGuidesVisible}
                     posterSnapEnabled={posterSnapEnabled}
                   />

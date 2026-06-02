@@ -1,7 +1,6 @@
 import { forwardRef, useMemo } from "react";
 import {
   findIncompleteRoomTypes,
-  type PosterComponentAddKind,
   type PosterComponentContentPatch,
 } from "../../domain/scheduleDocument";
 import { withMockCalculations } from "../../domain/mockCalculator";
@@ -23,15 +22,6 @@ interface ScheduleCanvasProps {
   reference: BuildingReference | null;
   selectedSlot: SlotAddress | null;
   onSlotSelect: (address: SlotAddress) => void;
-  onMetadataChange: (patch: {
-    title?: string;
-    subtitle?: string;
-    authorText?: string;
-    notes?: string[];
-    productionSummary?: Partial<ScheduleDocument["productionSummary"]>;
-    droneSummary?: Partial<ScheduleDocument["droneSummary"]>;
-  }) => void;
-  onActiveQueueChange: (queueId: string) => void;
   onRoomMove: (roomNodeId: string, rect: GridRect) => void;
   onRoomResize: (roomNodeId: string, rect: GridRect) => void;
   onRoomProductChange: (roomNodeId: string, product?: ProductKind) => void;
@@ -39,15 +29,9 @@ interface ScheduleCanvasProps {
   onPosterComponentRectChange: (componentId: string, rect: PosterRect) => void;
   onPosterComponentContentChange?: (componentId: string, patch: PosterComponentContentPatch) => void;
   onPosterComponentSelect?: (componentId: string | null) => void;
-  onPosterRegenerate: () => void;
-  onPosterComponentAdd?: (kind: PosterComponentAddKind) => void;
   onPosterComponentDelete?: (componentId: string) => void;
   onPosterComponentDuplicate?: (componentId: string) => void;
   onPosterComponentLayerChange?: (componentId: string, direction: "up" | "down") => void;
-  onPosterUndo?: () => void;
-  onPosterRedo?: () => void;
-  canUndoPoster?: boolean;
-  canRedoPoster?: boolean;
   posterGuidesVisible?: boolean;
   posterSnapEnabled?: boolean;
   selectedPosterComponentId?: string | null;

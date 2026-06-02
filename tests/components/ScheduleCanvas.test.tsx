@@ -22,10 +22,7 @@ function renderCanvas(schedule: ScheduleDocument, extra: Partial<Parameters<type
     <DndContext>
       <ScheduleCanvas
         document={schedule}
-        onActiveQueueChange={vi.fn()}
-        onMetadataChange={vi.fn()}
         onPosterComponentRectChange={vi.fn()}
-        onPosterRegenerate={vi.fn()}
         onRoomMove={vi.fn()}
         onRoomProductChange={vi.fn()}
         onRoomRemove={vi.fn()}
@@ -144,10 +141,7 @@ describe("ScheduleCanvas", () => {
               ),
             })),
           }}
-          onActiveQueueChange={vi.fn()}
-          onMetadataChange={vi.fn()}
           onPosterComponentRectChange={vi.fn()}
-          onPosterRegenerate={vi.fn()}
           onRoomMove={vi.fn()}
           onRoomProductChange={vi.fn()}
           onRoomRemove={vi.fn()}
@@ -244,8 +238,7 @@ describe("ScheduleCanvas", () => {
   });
 
   it("keeps poster headers componentized and editing controls outside the export canvas", () => {
-    const onPosterRegenerate = vi.fn();
-    const { container } = renderCanvas(createDefaultSchedule("243", 3), { onPosterRegenerate });
+    const { container } = renderCanvas(createDefaultSchedule("243", 3));
     const root = container.querySelector("[data-canvas-root]")!;
 
     expect(root.querySelector(":scope > header")).toBeNull();
@@ -268,10 +261,7 @@ describe("ScheduleCanvas", () => {
       <DndContext>
         <ScheduleCanvas
           document={{ ...createDefaultSchedule("243", 1), posterTemplateId: "card" }}
-          onActiveQueueChange={vi.fn()}
-          onMetadataChange={vi.fn()}
           onPosterComponentRectChange={vi.fn()}
-          onPosterRegenerate={vi.fn()}
           onRoomMove={vi.fn()}
           onRoomProductChange={vi.fn()}
           onRoomRemove={vi.fn()}
@@ -438,10 +428,7 @@ describe("ScheduleCanvas", () => {
       <DndContext>
         <ScheduleCanvas
           document={createDefaultSchedule("243", 3)}
-          onActiveQueueChange={vi.fn()}
-          onMetadataChange={vi.fn()}
           onPosterComponentRectChange={onPosterComponentRectChange}
-          onPosterRegenerate={vi.fn()}
           posterSnapEnabled={false}
           onRoomMove={vi.fn()}
           onRoomProductChange={vi.fn()}
@@ -489,10 +476,7 @@ describe("ScheduleCanvas", () => {
       <DndContext>
         <ScheduleCanvas
           document={createDefaultSchedule("243", 3)}
-          onActiveQueueChange={vi.fn()}
-          onMetadataChange={vi.fn()}
           onPosterComponentRectChange={onPosterComponentRectChange}
-          onPosterRegenerate={vi.fn()}
           posterSnapEnabled={false}
           onRoomMove={vi.fn()}
           onRoomProductChange={vi.fn()}

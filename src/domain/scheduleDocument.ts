@@ -500,7 +500,7 @@ export function addInfrastructureComponent(
     title: sourceRoom.label,
     roomNodeId: sourceRoom.roomNodeId,
     roomType: sourceRoom.roomType,
-    rect: posterRectFromCenter({ x: 600, y: 760, w: 1500, h: 2200 }, center),
+    rect: posterRectFromCenter({ x: 600, y: 760, w: 1500, h: 760 }, center),
     zIndex,
   };
 
