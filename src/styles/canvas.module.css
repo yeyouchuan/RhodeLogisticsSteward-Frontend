@@ -1393,9 +1393,9 @@
 
 .posterDividerLine {
   align-self: center;
-  height: 2px;
-  min-height: 2px;
-  background: rgba(40, 50, 44, 0.7);
+  height: 1px;
+  min-height: 1px;
+  background: rgba(40, 50, 44, 0.58);
 }
 
 .posterResizeHandle {

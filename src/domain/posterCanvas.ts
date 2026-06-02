@@ -15,10 +15,10 @@ import type {
 
 export const POSTER_COORD_MAX = 10000;
 export const MIN_POSTER_COMPONENT_SIZE = 400;
+const MIN_POSTER_DIVIDER_HEIGHT = 120;
 const POSTER_MARGIN = 220;
-const POSTER_LANE_TOP = 1120;
-const POSTER_DIVIDER_TOP = 1540;
-const POSTER_SECTION_TOP = 2020;
+const POSTER_DIVIDER_TOP = 1080;
+const POSTER_SECTION_TOP = 1260;
 
 export const DEFAULT_POSTER_COMPONENT_RECTS = {
   title: { x: POSTER_MARGIN, y: 180, w: 2700, h: 640 },
@@ -29,7 +29,7 @@ export const DEFAULT_POSTER_COMPONENT_RECTS = {
     x: POSTER_MARGIN,
     y: POSTER_DIVIDER_TOP,
     w: POSTER_COORD_MAX - POSTER_MARGIN * 2,
-    h: 400,
+    h: MIN_POSTER_DIVIDER_HEIGHT,
   },
 } as const satisfies Record<string, PosterRect>;
 
@@ -115,13 +115,17 @@ function componentId(value: string): string {
 }
 
 export function clampPosterRect(rect: PosterRect): PosterRect {
+  return clampPosterRectWithMinimum(rect, MIN_POSTER_COMPONENT_SIZE);
+}
+
+function clampPosterRectWithMinimum(rect: PosterRect, minimumHeight: number): PosterRect {
   const w = Math.min(
     POSTER_COORD_MAX,
     Math.max(MIN_POSTER_COMPONENT_SIZE, Math.round(finiteNumber(rect.w, MIN_POSTER_COMPONENT_SIZE))),
   );
   const h = Math.min(
     POSTER_COORD_MAX,
-    Math.max(MIN_POSTER_COMPONENT_SIZE, Math.round(finiteNumber(rect.h, MIN_POSTER_COMPONENT_SIZE))),
+    Math.max(minimumHeight, Math.round(finiteNumber(rect.h, minimumHeight))),
   );
   const x = Math.min(
     POSTER_COORD_MAX - w,
@@ -133,6 +137,10 @@ export function clampPosterRect(rect: PosterRect): PosterRect {
   );
 
   return { x, y, w, h };
+}
+
+export function clampPosterComponentRect(type: PosterComponentType, rect: PosterRect): PosterRect {
+  return clampPosterRectWithMinimum(rect, type === "divider" ? MIN_POSTER_DIVIDER_HEIGHT : MIN_POSTER_COMPONENT_SIZE);
 }
 
 export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanvasState {
@@ -177,27 +185,6 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
     },
   );
 
-  const laneCount = Math.max(1, view.lanes.length);
-  const laneWidth = Math.floor((POSTER_COORD_MAX - POSTER_MARGIN * 2) / laneCount);
-  view.lanes.forEach((lane, index) => {
-    const x = POSTER_MARGIN + laneWidth * index;
-
-    components.push({
-      id: componentId(`lane:${lane.id}`),
-      type: "laneLabel",
-      title: lane.label,
-      text: lane.durationLabel,
-      laneId: lane.id,
-      rect: {
-        x,
-        y: POSTER_LANE_TOP,
-        w: index === laneCount - 1 ? POSTER_COORD_MAX - POSTER_MARGIN - x : laneWidth,
-        h: 400,
-      },
-      zIndex: 12 + index,
-    });
-  });
-
   view.sections.forEach((section, index) => {
     components.push({
       id: componentId(`section:${section.id}`),
@@ -214,7 +201,7 @@ export function buildDefaultPosterCanvas(document: ScheduleDocument): PosterCanv
     sourceTemplateId: view.templateId,
     components: components.map((component) => ({
       ...component,
-      rect: clampPosterRect(component.rect),
+      rect: clampPosterComponentRect(component.type, component.rect),
     })),
   };
 }
@@ -262,7 +249,7 @@ function normalizeComponent(
     metricId: textValue(value.metricId),
     roomType,
     zIndex: Math.round(finiteNumber(value.zIndex, 1)),
-    rect: clampPosterRect({
+    rect: clampPosterComponentRect(type, {
       x: finiteNumber(value.rect.x, 0),
       y: finiteNumber(value.rect.y, 0),
       w: finiteNumber(value.rect.w, MIN_POSTER_COMPONENT_SIZE),

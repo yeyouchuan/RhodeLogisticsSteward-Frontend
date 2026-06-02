@@ -8,6 +8,7 @@ import { clampRect, rectsOverlap } from "./bentoGrid";
 import { createBentoRoomNode, createBentoSchedule, createRoomAssignment } from "./createBentoSchedule";
 import {
   buildDefaultPosterCanvas,
+  clampPosterComponentRect,
   clampPosterRect,
   DEFAULT_POSTER_COMPONENT_RECTS,
   normalizePosterCanvas,
@@ -337,7 +338,7 @@ export function updatePosterComponentRect(
     posterCanvas: {
       ...posterCanvas,
       components: posterCanvas.components.map((component) =>
-        component.id === componentId ? { ...component, rect: clampPosterRect(rect) } : component,
+        component.id === componentId ? { ...component, rect: clampPosterComponentRect(component.type, rect) } : component,
       ),
     },
   });
@@ -395,8 +396,13 @@ function nextPosterZIndex(components: PosterComponent[]): number {
   return Math.max(0, ...components.map((component) => component.zIndex)) + 1;
 }
 
-function posterRectFromCenter(baseRect: PosterRect, center?: PosterDropCenter): PosterRect {
-  return clampPosterRect(
+function posterRectFromCenter(
+  type: PosterComponentType,
+  baseRect: PosterRect,
+  center?: PosterDropCenter,
+): PosterRect {
+  return clampPosterComponentRect(
+    type,
     center
       ? {
           ...baseRect,
@@ -438,7 +444,7 @@ export function addPosterComponent(
       type: "metric",
       title: "产出摘要",
       text: view.metrics.map((metric) => `${metric.label}: ${metric.value}`).join(" / "),
-      rect: posterRectFromCenter(DEFAULT_POSTER_COMPONENT_RECTS.production, center),
+      rect: posterRectFromCenter("metric", DEFAULT_POSTER_COMPONENT_RECTS.production, center),
       zIndex,
     };
   } else if (kind === "note") {
@@ -447,7 +453,7 @@ export function addPosterComponent(
       type: "note",
       title: "文本备注",
       text: "自定义备注",
-      rect: posterRectFromCenter(DEFAULT_POSTER_COMPONENT_RECTS.note, center),
+      rect: posterRectFromCenter("note", DEFAULT_POSTER_COMPONENT_RECTS.note, center),
       zIndex,
     };
   } else if (kind === "divider") {
@@ -455,7 +461,7 @@ export function addPosterComponent(
       id: nextPosterComponentId(posterCanvas.components, kind, "manual"),
       type: "divider",
       title: "分隔线",
-      rect: posterRectFromCenter(DEFAULT_POSTER_COMPONENT_RECTS.divider, center),
+      rect: posterRectFromCenter("divider", DEFAULT_POSTER_COMPONENT_RECTS.divider, center),
       zIndex,
     };
   }
@@ -519,7 +525,7 @@ export function addInfrastructureComponent(
     title: section.title,
     sectionId: section.id,
     roomType: sourceRoom.roomType,
-    rect: posterRectFromCenter(defaultSectionRect(documentWithRoom, section.id), center),
+    rect: posterRectFromCenter("infrastructure", defaultSectionRect(documentWithRoom, section.id), center),
     zIndex,
   };
 

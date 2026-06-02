@@ -99,9 +99,9 @@ describe("ScheduleCanvas", () => {
     expect(container.querySelector("[data-canvas-root]")).toBeInTheDocument();
     expect(container.querySelector("[data-poster-canvas]")).toHaveAttribute("data-poster-template", "matrix");
     expect(screen.queryByRole("navigation", { name: /queue|队列/i })).not.toBeInTheDocument();
-    expect(container.querySelectorAll("[data-poster-lane]")).toHaveLength(4);
+    expect(container.querySelectorAll("[data-poster-lane]")).toHaveLength(0);
     expect(container.querySelectorAll("[data-poster-slot]")).toHaveLength(116);
-    expect(screen.getByText("队列 4")).toBeInTheDocument();
+    expect(screen.queryByText("队列 4")).not.toBeInTheDocument();
   });
 
   it("renders assignments from every queue even when another queue is active", () => {
@@ -132,8 +132,8 @@ describe("ScheduleCanvas", () => {
     const { container, rerender } = renderCanvas(comboDocument);
 
     expect(container.querySelector("[data-poster-canvas]")).toHaveAttribute("data-poster-template", "combo");
-    expect(screen.getByText("A+B")).toBeInTheDocument();
-    expect(screen.getByText("B+C")).toBeInTheDocument();
+    expect(container.querySelectorAll("[data-poster-lane]")).toHaveLength(0);
+    expect(container.querySelectorAll("[data-poster-slot]").length).toBeGreaterThan(0);
 
     rerender(
       <DndContext>

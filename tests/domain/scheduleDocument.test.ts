@@ -218,9 +218,9 @@ describe("schedule document operations", () => {
     const divider = addPosterComponent(createDefaultSchedule("243", 3), "divider", { x: 5000, y: 5000 });
     expect(divider.posterCanvas?.components.at(-1)?.rect).toMatchObject({
       x: 220,
-      y: 4800,
+      y: 4940,
       w: 9560,
-      h: 400,
+      h: 120,
     });
 
     const document = createDefaultSchedule("243", 3);

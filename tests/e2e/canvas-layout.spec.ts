@@ -82,8 +82,9 @@ test("sample 153 renders the smart matrix poster with four queues visible", asyn
 
   await expect(page.locator("[data-poster-canvas]")).toBeVisible();
   await expect(page.locator("[data-poster-canvas]")).toHaveAttribute("data-poster-template", "matrix");
-  await expect.poll(async () => page.locator("[data-poster-component]").count()).toBeGreaterThan(10);
-  await expect(page.locator("[data-poster-lane]")).toHaveCount(4);
+  await expect.poll(async () => page.locator("[data-poster-component]").count()).toBe(10);
+  await expect(page.locator("[data-poster-lane]")).toHaveCount(0);
+  await expect(page.getByText("队列 4")).toHaveCount(0);
   await expect(page.locator("[data-poster-slot]")).toHaveCount(116);
   await expect(page.locator("[data-poster-slot][data-filled='true']")).toHaveCount(0);
   await expect(page.locator("[data-portrait-frame]")).toHaveCount(0);
@@ -99,7 +100,7 @@ test("sample 153 renders strict touching sections with two queues", async ({ pag
   await page.goto("/sample/153?queues=2");
 
   await expect(page.locator("[data-poster-canvas]")).toHaveAttribute("data-poster-template", "splitPanel");
-  await expect(page.locator("[data-poster-lane]")).toHaveCount(2);
+  await expect(page.locator("[data-poster-lane]")).toHaveCount(0);
   await expect(page.locator("[data-poster-slot]")).toHaveCount(58);
   await expectStrictTouchingSections(page);
 });
@@ -175,7 +176,7 @@ test("free poster components can be dragged, undone, cleared, and regenerated", 
   await expect(page.locator("[data-poster-component]")).toHaveCount(0);
 
   await page.getByRole("button", { name: "重排海报" }).click();
-  await expect.poll(async () => page.locator("[data-poster-component]").count()).toBeGreaterThan(10);
+  await expect.poll(async () => page.locator("[data-poster-component]").count()).toBe(10);
 });
 
 test("free poster components resize from selected edge handles", async ({ page }) => {
@@ -396,7 +397,7 @@ test("combo and jade poster routes render their dedicated sections", async ({ pa
   await page.goto("/sample/252?mode=combo");
 
   await expect(page.locator("[data-poster-canvas]")).toHaveAttribute("data-poster-template", "combo");
-  await expect(page.locator("[data-poster-lane]")).toHaveCount(6);
+  await expect(page.locator("[data-poster-lane]")).toHaveCount(0);
   await expectStrictTouchingSections(page);
 
   await page.goto("/sample/342?strategy=origin-stone");
