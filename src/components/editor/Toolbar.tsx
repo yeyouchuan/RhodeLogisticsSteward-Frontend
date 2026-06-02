@@ -1,4 +1,5 @@
 import { Select } from "@base-ui/react/select";
+import type { ReactNode } from "react";
 import {
   ArrowCounterClockwiseIcon,
   CaretDownIcon,
@@ -6,9 +7,17 @@ import {
   FileArrowDownIcon,
   FileArrowUpIcon,
 } from "@phosphor-icons/react";
-import { layoutPresets } from "../../data/layoutPresets";
+import { bentoLayoutIds } from "../../domain/bentoDefinitions";
+import {
+  normalizePosterMode,
+  normalizePosterTemplateId,
+  posterModeIds,
+  posterModeLabels,
+  posterTemplateIds,
+  posterTemplateLabels,
+} from "../../domain/posterDefinitions";
 import { queueCountOptions } from "../../domain/queueLimits";
-import type { ScheduleDocument } from "../../domain/types";
+import type { PosterMode, PosterTemplateId, ScheduleDocument } from "../../domain/types";
 import styles from "../../styles/editor.module.css";
 import { ContourButton } from "../ui/ContourButton";
 
@@ -16,26 +25,26 @@ interface ToolbarProps {
   document: ScheduleDocument;
   onLayoutChange: (layoutId: string) => void;
   onQueueCountChange: (count: number) => void;
+  onPosterTemplateChange: (templateId: PosterTemplateId) => void;
+  onPosterModeChange: (mode: PosterMode) => void;
   onImportClick: () => void;
   onExportJson: () => void;
   onExportPng: () => void;
   onReset: () => void;
 }
 
-function SelectField({
-  label,
+function LayoutSelect({
   value,
-  items,
   onChange,
 }: {
-  label: string;
   value: string;
-  items: { label: string; value: string }[];
   onChange: (value: string) => void;
 }) {
+  const items = bentoLayoutIds.map((layoutId) => ({ label: layoutId, value: layoutId }));
+
   return (
     <label className={styles.field}>
-      <span className={styles.fieldLabel}>{label}</span>
+      <span className={styles.fieldLabel}>布局</span>
       <Select.Root items={items} onValueChange={(next) => onChange(String(next))} value={value}>
         <Select.Trigger className={styles.selectTrigger}>
           <Select.Value />
@@ -67,10 +76,38 @@ function SelectField({
   );
 }
 
+function NativeSelect({
+  label,
+  value,
+  children,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  children: ReactNode;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className={styles.field}>
+      <span className={styles.fieldLabel}>{label}</span>
+      <select
+        aria-label={label}
+        className={styles.textInput}
+        onChange={(event) => onChange(event.target.value)}
+        value={value}
+      >
+        {children}
+      </select>
+    </label>
+  );
+}
+
 export function Toolbar({
   document,
   onLayoutChange,
   onQueueCountChange,
+  onPosterTemplateChange,
+  onPosterModeChange,
   onImportClick,
   onExportJson,
   onExportPng,
@@ -78,30 +115,76 @@ export function Toolbar({
 }: ToolbarProps) {
   return (
     <div className={styles.toolbar}>
-      <SelectField
-        items={layoutPresets.map((preset) => ({ label: preset.label, value: preset.id }))}
-        label="布局"
-        onChange={onLayoutChange}
-        value={document.layoutId}
-      />
-      <SelectField
-        items={queueCountOptions.map((count) => ({ label: `${count} 队列`, value: String(count) }))}
-        label="队列"
-        onChange={(value) => onQueueCountChange(Number(value))}
-        value={String(document.queueCount)}
-      />
-      <ContourButton icon={<FileArrowUpIcon />} onClick={onImportClick} size="sm" variant="white">
-        导入
-      </ContourButton>
-      <ContourButton icon={<FileArrowDownIcon />} onClick={onExportJson} size="sm" variant="white">
-        JSON
-      </ContourButton>
-      <ContourButton icon={<ArrowCounterClockwiseIcon />} onClick={onReset} size="sm" variant="red">
-        重置
-      </ContourButton>
-      <ContourButton icon={<DownloadSimpleIcon />} onClick={onExportPng} size="sm" variant="yellow">
-        导出图片
-      </ContourButton>
+      <div className={styles.toolbarLeading}>
+        <LayoutSelect onChange={onLayoutChange} value={document.layoutId} />
+        <NativeSelect
+          label="队列"
+          onChange={(value) => onQueueCountChange(Number(value))}
+          value={String(document.queueCount)}
+        >
+          {queueCountOptions.map((count) => (
+            <option key={count} value={count}>
+              {count} 队列
+            </option>
+          ))}
+        </NativeSelect>
+        <NativeSelect
+          label="导出模板"
+          onChange={(value) => onPosterTemplateChange(value as PosterTemplateId)}
+          value={normalizePosterTemplateId(document.posterTemplateId)}
+        >
+          {posterTemplateIds.map((templateId) => (
+            <option key={templateId} value={templateId}>
+              {posterTemplateLabels[templateId]}
+            </option>
+          ))}
+        </NativeSelect>
+        <NativeSelect
+          label="排班模式"
+          onChange={(value) => onPosterModeChange(value as PosterMode)}
+          value={normalizePosterMode(document.posterMode)}
+        >
+          {posterModeIds.map((mode) => (
+            <option key={mode} value={mode}>
+              {posterModeLabels[mode]}
+            </option>
+          ))}
+        </NativeSelect>
+      </div>
+      <div className={styles.toolbarActions}>
+        <ContourButton
+          icon={<FileArrowUpIcon />}
+          onClick={onImportClick}
+          size="sm"
+          variant="white"
+        >
+          导入
+        </ContourButton>
+        <ContourButton
+          icon={<FileArrowDownIcon />}
+          onClick={onExportJson}
+          size="sm"
+          variant="white"
+        >
+          JSON
+        </ContourButton>
+        <ContourButton
+          icon={<ArrowCounterClockwiseIcon />}
+          onClick={onReset}
+          size="sm"
+          variant="red"
+        >
+          重置
+        </ContourButton>
+        <ContourButton
+          icon={<DownloadSimpleIcon />}
+          onClick={onExportPng}
+          size="sm"
+          variant="yellow"
+        >
+          导出图片
+        </ContourButton>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
-import { validateScheduleDocument } from "../domain/scheduleDocument";
+import { migrateScheduleDocument } from "../domain/migrateScheduleDocument";
 import type { ScheduleDocument } from "../domain/types";
 
-const storageKey = "rhode-logistics-schedule-draft-v1";
+const storageKey = "rhode-logistics-schedule-draft-v2";
 
 export function loadLocalDraft(): ScheduleDocument | null {
   if (typeof window === "undefined") {
@@ -15,7 +15,7 @@ export function loadLocalDraft(): ScheduleDocument | null {
     }
 
     const parsed = JSON.parse(raw) as unknown;
-    return validateScheduleDocument(parsed) ? parsed : null;
+    return migrateScheduleDocument(parsed);
   } catch {
     return null;
   }

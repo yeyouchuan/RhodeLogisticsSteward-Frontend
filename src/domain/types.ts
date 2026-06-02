@@ -30,6 +30,20 @@ export type BuildingRoomTypeId =
   | "TRAINING"
   | "WORKSHOP";
 
+export type BentoRoomTypeId =
+  | "CONTROL"
+  | "TRADING"
+  | "MANUFACTURE"
+  | "POWER"
+  | "MEETING"
+  | "HIRE";
+
+export type BentoRoomColorRole = "trade" | "manufacture" | "power" | "other";
+
+export type PosterTemplateId = "auto" | "matrix" | "splitPanel" | "card" | "combo";
+
+export type PosterMode = "normal" | "autoRotation" | "dailyRotation" | "combo";
+
 export type ProductionFormulaTypeId =
   | "F_EXP"
   | "F_GOLD"
@@ -119,11 +133,78 @@ export interface SlotAssignment {
   isOptional?: boolean;
 }
 
+export interface GridRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface BentoCanvasGrid {
+  columns: 6;
+  rows: 4;
+}
+
+export interface PosterGrid {
+  columns: 12;
+  rows: 6;
+}
+
+export type PosterComponentType =
+  | "infrastructure"
+  | "laneLabel"
+  | "metric"
+  | "note"
+  | "divider";
+
+export interface PosterRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface PosterComponent {
+  id: string;
+  type: PosterComponentType;
+  title: string;
+  rect: PosterRect;
+  zIndex: number;
+  roomNodeId?: string;
+  roomType?: BentoRoomTypeId;
+  sectionId?: string;
+  laneId?: string;
+  metricId?: string;
+  text?: string;
+}
+
+export interface PosterCanvasState {
+  schemaVersion: 2;
+  sourceTemplateId: Exclude<PosterTemplateId, "auto">;
+  components: PosterComponent[];
+}
+
+export interface BentoRoomNode {
+  roomNodeId: string;
+  roomType: BentoRoomTypeId;
+  roomIndex: number;
+  label: string;
+  slotCount: number;
+  product?: ProductKind;
+  rect: GridRect;
+}
+
+export interface BentoCanvasState {
+  grid: BentoCanvasGrid;
+  rooms: BentoRoomNode[];
+}
+
 export interface RoomAssignment {
   assignmentId: string;
+  roomNodeId: string;
   roomType: string;
   roomIndex: number;
-  product?: string;
+  product?: ProductKind;
   operators: SlotAssignment[];
   paperEfficiencyLabel: string;
   effectiveEfficiencyLabel: string;
@@ -152,12 +233,17 @@ export interface DroneSummary {
 }
 
 export interface ScheduleDocument {
-  version: 1;
+  version: 2;
   title: string;
   subtitle: string;
   authorText: string;
   layoutId: string;
   queueCount: number;
+  activeQueueId: string;
+  posterTemplateId?: PosterTemplateId;
+  posterMode?: PosterMode;
+  posterCanvas?: PosterCanvasState;
+  canvas: BentoCanvasState;
   queues: ScheduleQueue[];
   productionSummary: ProductionSummary;
   droneSummary: DroneSummary;

@@ -11,7 +11,7 @@
 - 支持拖拽干员到槽位、槽位互换、清空槽位，以及在选择弹窗里设置精英化阶段。
 - 支持编辑标题、副标题、产出摘要、无人机说明、队列标签和房间效率文本。
 - 自动把当前草稿保存到 `localStorage`。
-- 支持导出 `ScheduleDocument` v1 JSON，并可重新导入继续编辑。
+- 支持导出 `ScheduleDocument` v2 JSON，并可重新导入继续编辑。
 - 支持把排班画布导出为 2x 像素密度的 PNG 图片。
 
 ## 技术栈
@@ -116,9 +116,9 @@ bun run preview
 
 ## 数据格式
 
-JSON 导入导出使用 `ScheduleDocument` v1。校验逻辑位于 `src/domain/scheduleDocument.ts`，类型定义位于 `src/domain/types.ts`。
+JSON 导入导出使用 `ScheduleDocument` v2，并兼容迁移 legacy v1 与 MAA `custom_infrast`。校验逻辑位于 `src/domain/scheduleDocument.ts`，类型定义位于 `src/domain/types.ts`。
 
-导出的 JSON 会保留布局、队列数量、房间分配、干员槽位、标题、摘要、无人机说明和备注等可编辑内容。
+参数、导入规则和 demo URL 说明见 [docs/import-export-parameters.md](docs/import-export-parameters.md)。
 
 ## 当前限制
 

@@ -103,6 +103,14 @@ function parseTargets(value) {
     return [];
   }
 
+  if (Array.isArray(value)) {
+    return value.filter((item) => formulaOrder.includes(item));
+  }
+
+  if (typeof value !== "string") {
+    return [];
+  }
+
   try {
     const parsed = JSON.parse(value);
     return Array.isArray(parsed) ? parsed.filter((item) => formulaOrder.includes(item)) : [];
@@ -113,6 +121,17 @@ function parseTargets(value) {
 
 function unique(values) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function field(row, ...names) {
+  for (const name of names) {
+    const value = row[name];
+    if (value !== undefined && value !== "") {
+      return value;
+    }
+  }
+
+  return "";
 }
 
 const [
@@ -133,9 +152,45 @@ const [
   readFile(path.join(sourceRoot, "manifest.json"), "utf8").then(JSON.parse),
 ]);
 
-const roomNameById = new Map(rooms.map((room) => [room.room_id, room.room_name]));
+const canonicalOperatorBuffs = operatorBuffs.map((row) => ({
+  ...row,
+  operator_id: field(row, "operator_id", "operatorId", "charId"),
+  operator_name: field(row, "operator_name", "operatorName", "name"),
+  buff_id: field(row, "buff_id", "buffId"),
+  buff_name: field(row, "buff_name", "buffName"),
+  room_type: field(row, "room_type", "roomType", "room_id", "roomId"),
+  condition_phase: field(row, "condition_phase", "conditionPhase"),
+  condition_level: field(row, "condition_level", "conditionLevel"),
+}));
+const canonicalBuffs = buffs.map((buff) => ({
+  ...buff,
+  buff_id: field(buff, "buff_id", "buffId"),
+  buff_name: field(buff, "buff_name", "buffName"),
+  room_type: field(buff, "room_type", "roomType", "room_id", "roomId"),
+  description_text: field(buff, "description_text", "descriptionText"),
+  targets_json: field(buff, "targets_json", "targetsJson", "targets"),
+}));
+const canonicalRooms = rooms.map((room) => ({
+  ...room,
+  room_id: field(room, "room_id", "roomId", "id"),
+  room_name: field(room, "room_name", "roomName", "name"),
+}));
+const canonicalManufactFormulas = manufactFormulas.map((row) => ({
+  ...row,
+  formula_type: field(row, "formula_type", "formulaType"),
+  buff_type: field(row, "buff_type", "buffType"),
+  item_name: field(row, "item_name", "itemName", "name"),
+}));
+const canonicalWorkshopFormulas = workshopFormulas.map((row) => ({
+  ...row,
+  formula_type: field(row, "formula_type", "formulaType"),
+  buff_type: field(row, "buff_type", "buffType"),
+  item_name: field(row, "item_name", "itemName", "name"),
+}));
+
+const roomNameById = new Map(canonicalRooms.map((room) => [room.room_id, room.room_name]));
 const skillsById = Object.fromEntries(
-  buffs.map((buff) => [
+  canonicalBuffs.map((buff) => [
     buff.buff_id,
     {
       buffId: buff.buff_id,
@@ -148,7 +203,7 @@ const skillsById = Object.fromEntries(
   ]),
 );
 
-const operatorSkills = operatorBuffs.map((row) => {
+const operatorSkills = canonicalOperatorBuffs.map((row) => {
   const skill = skillsById[row.buff_id];
 
   return {
@@ -165,20 +220,20 @@ const operatorSkills = operatorBuffs.map((row) => {
 });
 
 const roomTypes = roomOrder
-  .filter((roomType) => operatorBuffs.some((row) => row.room_type === roomType))
+  .filter((roomType) => canonicalOperatorBuffs.some((row) => row.room_type === roomType))
   .map((roomType) => ({
     id: roomType,
     label: roomNameById.get(roomType) ?? roomLabels[roomType] ?? roomType,
     sourceRoomId: roomType,
     operatorCount: new Set(
-      operatorBuffs.filter((row) => row.room_type === roomType).map((row) => row.operator_id),
+      canonicalOperatorBuffs.filter((row) => row.room_type === roomType).map((row) => row.operator_id),
     ).size,
-    skillRowCount: operatorBuffs.filter((row) => row.room_type === roomType).length,
+    skillRowCount: canonicalOperatorBuffs.filter((row) => row.room_type === roomType).length,
   }));
 
 function createFormulaOption(formulaType) {
-  const manufacturing = manufactFormulas.filter((row) => row.formula_type === formulaType);
-  const workshop = workshopFormulas.filter((row) => row.formula_type === formulaType);
+  const manufacturing = canonicalManufactFormulas.filter((row) => row.formula_type === formulaType);
+  const workshop = canonicalWorkshopFormulas.filter((row) => row.formula_type === formulaType);
   return {
     id: formulaType,
     label: formulaLabels[formulaType] ?? formulaType,
